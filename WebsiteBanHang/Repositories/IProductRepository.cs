@@ -1,5 +1,4 @@
-﻿// IProductRepository.cs
-using WebsiteBanHang.Models;
+﻿using WebsiteBanHang.Models;
 
 namespace WebsiteBanHang.Repositories
 {

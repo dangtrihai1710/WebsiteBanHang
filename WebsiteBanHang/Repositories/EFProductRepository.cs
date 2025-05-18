@@ -1,5 +1,4 @@
-﻿// EFProductRepository.cs
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using WebsiteBanHang.Models;
 
 namespace WebsiteBanHang.Repositories
