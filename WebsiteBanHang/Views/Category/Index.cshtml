@@ -1,0 +1,72 @@
+﻿@model IEnumerable<WebsiteBanHang.Models.Category>
+@{
+    ViewData["Title"] = "Quản lý danh mục";
+}
+
+<h2>Danh sách danh mục</h2>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @TempData["ErrorMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @TempData["SuccessMessage"]
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+<p>
+    <a asp-action="Add" class="btn btn-primary">Thêm danh mục mới</a>
+</p>
+
+<div class="card shadow mb-4">
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Tên danh mục</th>
+                        <th>Số sản phẩm</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@item.Id</td>
+                            <td>@item.Name</td>
+                            <td>@(item.Products?.Count ?? 0)</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a asp-action="Update" asp-route-id="@item.Id" class="btn btn-warning btn-sm">
+                                        <i class="bi bi-pencil"></i> Sửa
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm ms-1">
+                                        <i class="bi bi-trash"></i> Xóa
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Auto-close alerts after 5 seconds
+        setTimeout(function () {
+            $('.alert').alert('close');
+        }, 5000);
+    </script>
+}

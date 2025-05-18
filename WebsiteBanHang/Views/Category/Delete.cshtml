@@ -1,0 +1,24 @@
+﻿@model WebsiteBanHang.Models.Category
+@{
+    ViewData["Title"] = "Xóa danh mục";
+}
+
+<h2>Xác nhận xóa</h2>
+
+<div class="alert alert-danger">
+    <h4>Bạn có chắc chắn muốn xóa danh mục này?</h4>
+    <p>Lưu ý: Việc xóa danh mục có thể ảnh hưởng đến các sản phẩm thuộc danh mục này.</p>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body">
+        <h5 class="card-title">@Model.Name</h5>
+        <p class="card-text">ID: @Model.Id</p>
+    </div>
+</div>
+
+<form asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Xóa</button>
+    <a asp-action="Index" class="btn btn-secondary">Quay lại</a>
+</form>
