@@ -1,8 +1,68 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@model IEnumerable<WebsiteBanHang.Models.Product>
+@{
+    ViewData["Title"] = "Trang Chủ";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="row">
+    <!-- Cột trái hiển thị sản phẩm -->
+    <div class="col-lg-9">
+        <div class="row">
+            @if (Model != null && Model.Any())
+            {
+                foreach (var product in Model)
+                {
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <!-- Hình ảnh sản phẩm với kiểm tra null -->
+                            <img class="card-img-top"
+                                 src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/images/placeholder.jpg" : product.ImageUrl)"
+                                 alt="@product.Name"
+                                 style="height: 200px; object-fit: cover;">
+                            <div class="card-body">
+                                <h5 class="card-title">@product.Name</h5>
+                                <p class="card-text">@(string.IsNullOrEmpty(product.Description) ? "Không có mô tả" : product.Description)</p>
+                                <p class="card-text">Giá: @product.Price.ToString("#,##0") VNĐ</p>
+                            </div>
+                            <div class="card-footer p-2 pt-0 border-top-0 bg-transparent">
+                                <div class="text-center">
+                                    <a class="btn btn-primary mt-auto" href="@Url.Action("AddToCart", "ShoppingCart", new { productId = product.Id, quantity = 1 })">Mua Ngay</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center">
+                    <p>Không có sản phẩm nào.</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Cột phải hiển thị sidebar -->
+    <div class="col-lg-3">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                Social Media
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-column">
+                    <a href="#" class="mb-2 text-decoration-none">
+                        <i class="bi-facebook me-2"></i>Facebook
+                    </a>
+                    <a href="#" class="mb-2 text-decoration-none">
+                        <i class="bi-twitter me-2"></i>Twitter
+                    </a>
+                    <a href="#" class="mb-2 text-decoration-none">
+                        <i class="bi-instagram me-2"></i>Instagram
+                    </a>
+                    <a href="#" class="mb-2 text-decoration-none">
+                        <i class="bi-linkedin me-2"></i>LinkedIn
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
