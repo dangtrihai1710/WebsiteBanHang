@@ -1,45 +1,100 @@
-﻿html {
-    font-size: 14px;
-}
-
-@media (min-width: 768px) {
-    html {
-        font-size: 16px;
-    }
-}
-
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
-}
-
-html {
-    position: relative;
-    min-height: 100%;
-}
-
-body {
-    margin-bottom: 60px;
-}
-
-/* Card styles */
+﻿/* Card styles nâng cao */
 .card {
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    transition: all 0.3s ease;
+    border-radius: 0.5rem;
 }
 
     .card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
     }
 
 /* Product image styles */
 .card-img-top {
-    object-fit: cover;
-    height: 200px;
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+}
+
+/* Button styles */
+.btn {
+    border-radius: 0.25rem;
+    padding: 0.5rem 1rem;
+    font-weight: 500;
+    transition: all 0.2s;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+    .btn-primary:hover {
+        background-color: #0b5ed7;
+        border-color: #0a58ca;
+        transform: translateY(-2px);
+    }
+
+.btn-outline-primary {
+    color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+    .btn-outline-primary:hover {
+        background-color: #0d6efd;
+        color: white;
+        transform: translateY(-2px);
+    }
+
+/* Feature icon styles */
+.feature {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 0.75rem;
+    font-size: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Hero section */
+.bg-primary {
+    background: linear-gradient(135deg, #0d6efd, #6610f2) !important;
+}
+
+/* Section titles */
+h2.fw-bold {
+    margin-bottom: 1.5rem;
+}
+
+/* Badge styles */
+.badge {
+    font-weight: 500;
+    padding: 0.5em 0.8em;
 }
 
 /* Responsive adjustments */
 @media (max-width: 576px) {
     .card-img-top {
-        height: 180px;
+        height: 200px;
     }
 }
+/* Footer styles */
+html, body {
+    height: 100%;
+}
+
+.footer {
+    background-color: #f8f9fa;
+    color: #6c757d;
+    font-size: 0.875rem;
+}
+
+    .footer a {
+        color: #6c757d;
+        text-decoration: none;
+    }
+
+        .footer a:hover {
+            color: #0d6efd;
+            text-decoration: underline;
+        }

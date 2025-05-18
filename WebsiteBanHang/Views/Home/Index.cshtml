@@ -3,30 +3,120 @@
     ViewData["Title"] = "Trang chủ";
 }
 
+<!-- Hero Section -->
+<section class="bg-primary text-white py-5 rounded-3 mb-4">
+    <div class="container px-4 px-lg-5 my-3">
+        <div class="text-center">
+            <h1 class="display-4 fw-bolder">Chào mừng đến với cửa hàng của chúng tôi</h1>
+            <p class="lead fw-normal text-white-50 mb-0">Khám phá các sản phẩm chất lượng cao với giá cả hợp lý</p>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section class="mb-5">
+    <div class="container">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="card bg-light text-dark h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4 p-lg-5">
+                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4 p-2 d-inline-block">
+                            <i class="bi bi-collection fs-2"></i>
+                        </div>
+                        <h2 class="fs-4 fw-bold">Sản phẩm mới</h2>
+                        <p class="mb-0">Khám phá những sản phẩm mới nhất của chúng tôi!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-light text-dark h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4 p-lg-5">
+                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4 p-2 d-inline-block">
+                            <i class="bi bi-gift fs-2"></i>
+                        </div>
+                        <h2 class="fs-4 fw-bold">Khuyến mãi đặc biệt</h2>
+                        <p class="mb-0">Ưu đãi hấp dẫn dành cho khách hàng thân thiết!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card bg-light text-dark h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4 p-lg-5">
+                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4 p-2 d-inline-block">
+                            <i class="bi bi-truck fs-2"></i>
+                        </div>
+                        <h2 class="fs-4 fw-bold">Giao hàng nhanh</h2>
+                        <p class="mb-0">Giao hàng tận nơi, nhanh chóng và an toàn!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Products Section -->
 <section class="py-2">
     <div class="container px-4 px-lg-5 mt-5">
-        <h2 class="mb-4">Sản phẩm của chúng tôi</h2>
-        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+        <h2 class="fw-bold mb-4 position-relative pb-2">
+            Sản phẩm nổi bật
+            <span class="position-absolute start-0 bottom-0" style="width: 50px; height: 2px; background-color: #0d6efd;"></span>
+        </h2>
+
+        <div class="row gx-4 gx-lg-5 row-cols-1 row-cols-md-3 row-cols-xl-4 justify-content-center">
             @foreach (var item in Model)
             {
                 <div class="col mb-5">
-                    <div class="card gap-3" style="width: 18rem">
-                        <img src="@item.ImageUrl" class="card-img-top" alt="..." style="height: 300px; object-fit: cover;">
-                        <div class="card-body">
-                            <h5 class="card-title">@Html.DisplayFor(modelItem => item.Name)</h5>
-                            <div class="d-flex">
-                                <span>Giá: </span>
-                                <p class="mx-3">@item.Price.ToString("#,##0") VNĐ</p>
+                    <div class="card h-100 border-0 shadow-sm">
+                        <!-- Sale badge-->
+                        <div class="badge bg-danger text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Giảm giá</div>
+                        <!-- Product image-->
+                        <img class="card-img-top" src="@item.ImageUrl" alt="@item.Name" style="height: 250px; object-fit: cover;">
+                        <!-- Product details-->
+                        <div class="card-body p-4">
+                            <div class="text-center">
+                                <!-- Product name-->
+                                <h5 class="fw-bolder">@Html.DisplayFor(modelItem => item.Name)</h5>
+                                <!-- Product category -->
+                                <div class="d-flex justify-content-center small text-muted mb-2">
+                                    <div class="text-primary">@item.Category?.Name</div>
+                                </div>
+                                <!-- Product price-->
+                                <span class="fw-bold text-danger fs-5">@item.Price.ToString("#,##0") VNĐ</span>
                             </div>
-                            <a href="@Url.Action("Display", "Product", new { id = item.Id })">
-                                <button class="btn btn-outline-dark">
-                                    <i class="bi-cart-fill me-1"></i> Xem chi tiết
-                                </button>
-                            </a>
+                        </div>
+                        <!-- Product actions-->
+                        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
+                            <div class="d-flex justify-content-between">
+                                <a href="@Url.Action("Display", "Product", new { id = item.Id })" class="btn btn-outline-primary">
+                                    <i class="bi bi-eye"></i> Chi tiết
+                                </a>
+                                <a href="#" class="btn btn-primary">
+                                    <i class="bi bi-cart-plus"></i> Thêm vào giỏ
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             }
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter -->
+<section class="py-5 bg-light rounded-3">
+    <div class="container px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-7">
+                <div class="text-center">
+                    <h2 class="fw-bold mb-3">Đăng ký nhận thông tin</h2>
+                    <p class="text-muted mb-4">Để nhận thông tin khuyến mãi và sản phẩm mới nhất từ chúng tôi!</p>
+                    <div class="input-group mb-3 shadow-sm">
+                        <input class="form-control" type="email" placeholder="Nhập email của bạn..." aria-label="Nhập email của bạn..." aria-describedby="button-newsletter" />
+                        <button class="btn btn-primary" id="button-newsletter" type="button">Đăng ký</button>
+                    </div>
+                    <div class="small text-muted">Chúng tôi sẽ không bao giờ chia sẻ thông tin của bạn cho bên thứ ba.</div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
