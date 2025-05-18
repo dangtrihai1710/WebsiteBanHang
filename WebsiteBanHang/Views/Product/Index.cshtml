@@ -1,37 +1,42 @@
 ﻿@model IEnumerable<WebsiteBanHang.Models.Product>
-@{
-    ViewData["Title"] = "Danh sách sản phẩm";
-}
 
-<div class="row mb-3">
-    <div class="col">
-        <h2>Danh sách sản phẩm</h2>
-    </div>
-    <div class="col text-end">
-        <a asp-action="Add" class="btn btn-primary">Thêm sản phẩm mới</a>
-    </div>
-</div>
+<h2>Danh sách sản phẩm</h2>
 
-<div class="row">
-    @foreach (var product in Model)
-    {
-        <div class="col-md-4 mb-4">
-            <div class="card h-100">
-                <!-- Hình ảnh sản phẩm -->
-                <img class="card-img-top" src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/images/placeholder.jpg" : product.ImageUrl)" alt="@product.Name" style="height: 200px; object-fit: cover;">
-                <div class="card-body">
-                    <h5 class="card-title">@product.Name</h5>
-                    <p class="card-text">@product.Description</p>
-                    <p class="card-text">Giá: @product.Price.ToString("#,##0") VNĐ</p>
-                </div>
-                <div class="card-footer p-2 pt-0 border-top-0 bg-transparent">
-                    <div class="text-center d-flex justify-content-between">
-                        <a asp-action="Display" asp-route-id="@product.Id" class="btn btn-info">Chi tiết</a>
-                        <a asp-action="Update" asp-route-id="@product.Id" class="btn btn-warning">Sửa</a>
-                        <a asp-action="Delete" asp-route-id="@product.Id" class="btn btn-danger">Xóa</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-</div>
+<p>
+    <a asp-action="Add" class="btn btn-primary">Thêm sản phẩm mới</a>
+</p>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tên</th>
+            <th>Giá</th>
+            <th>Mô tả</th>
+            <th>Danh mục</th>
+            <th>Hình ảnh</th>
+            <th>Thao tác</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td>@item.Price.ToString("#,##0") VNĐ</td>
+                <td>@item.Description</td>
+                <td>@item.Category?.Name</td>
+                <td>
+                    @if (!string.IsNullOrEmpty(item.ImageUrl))
+                    {
+                        <img src="@item.ImageUrl" alt="@item.Name" style="max-width: 50px" />
+                    }
+                </td>
+                <td>
+                    <a asp-action="Display" asp-route-id="@item.Id" class="btn btn-info">Xem</a>
+                    <a asp-action="Update" asp-route-id="@item.Id" class="btn btn-warning">Sửa</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger">Xóa</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

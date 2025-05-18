@@ -1,22 +1,19 @@
-﻿using WebsiteBanHang.Repositories;
+﻿using Microsoft.EntityFrameworkCore;
+using WebsiteBanHang.Models;
+using WebsiteBanHang.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Cấu hình Session
-builder.Services.AddDistributedMemoryCache();
-builder.Services.AddSession(options =>
-{
-    options.IdleTimeout = TimeSpan.FromMinutes(30);
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
-});
+// Cấu hình DbContext
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Đăng ký repositories
-builder.Services.AddSingleton<IProductRepository, MockProductRepository>();
-builder.Services.AddScoped<ICategoryRepository, MockCategoryRepository>();
+// Đăng ký Repositories
+builder.Services.AddScoped<IProductRepository, EFProductRepository>();
+builder.Services.AddScoped<ICategoryRepository, EFCategoryRepository>();
 
 var app = builder.Build();
 
@@ -31,7 +28,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-app.UseSession(); // Thêm middleware session
 
 app.UseAuthorization();
 

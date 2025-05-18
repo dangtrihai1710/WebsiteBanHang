@@ -1,68 +1,32 @@
 ﻿@model IEnumerable<WebsiteBanHang.Models.Product>
 @{
-    ViewData["Title"] = "Trang Chủ";
+    ViewData["Title"] = "Trang chủ";
 }
 
-<div class="row">
-    <!-- Cột trái hiển thị sản phẩm -->
-    <div class="col-lg-9">
-        <div class="row">
-            @if (Model != null && Model.Any())
+<section class="py-2">
+    <div class="container px-4 px-lg-5 mt-5">
+        <h2 class="mb-4">Sản phẩm của chúng tôi</h2>
+        <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+            @foreach (var item in Model)
             {
-                foreach (var product in Model)
-                {
-                    <div class="col-md-4 mb-4">
-                        <div class="card h-100">
-                            <!-- Hình ảnh sản phẩm với kiểm tra null -->
-                            <img class="card-img-top"
-                                 src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/images/placeholder.jpg" : product.ImageUrl)"
-                                 alt="@product.Name"
-                                 style="height: 200px; object-fit: cover;">
-                            <div class="card-body">
-                                <h5 class="card-title">@product.Name</h5>
-                                <p class="card-text">@(string.IsNullOrEmpty(product.Description) ? "Không có mô tả" : product.Description)</p>
-                                <p class="card-text">Giá: @product.Price.ToString("#,##0") VNĐ</p>
+                <div class="col mb-5">
+                    <div class="card gap-3" style="width: 18rem">
+                        <img src="@item.ImageUrl" class="card-img-top" alt="..." style="height: 300px; object-fit: cover;">
+                        <div class="card-body">
+                            <h5 class="card-title">@Html.DisplayFor(modelItem => item.Name)</h5>
+                            <div class="d-flex">
+                                <span>Giá: </span>
+                                <p class="mx-3">@item.Price.ToString("#,##0") VNĐ</p>
                             </div>
-                            <div class="card-footer p-2 pt-0 border-top-0 bg-transparent">
-                                <div class="text-center">
-                                    <a class="btn btn-primary mt-auto" href="@Url.Action("AddToCart", "ShoppingCart", new { productId = product.Id, quantity = 1 })">Mua Ngay</a>
-                                </div>
-                            </div>
+                            <a href="@Url.Action("Display", "Product", new { id = item.Id })">
+                                <button class="btn btn-outline-dark">
+                                    <i class="bi-cart-fill me-1"></i> Xem chi tiết
+                                </button>
+                            </a>
                         </div>
                     </div>
-                }
-            }
-            else
-            {
-                <div class="col-12 text-center">
-                    <p>Không có sản phẩm nào.</p>
                 </div>
             }
         </div>
     </div>
-
-    <!-- Cột phải hiển thị sidebar -->
-    <div class="col-lg-3">
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                Social Media
-            </div>
-            <div class="card-body">
-                <div class="d-flex flex-column">
-                    <a href="#" class="mb-2 text-decoration-none">
-                        <i class="bi-facebook me-2"></i>Facebook
-                    </a>
-                    <a href="#" class="mb-2 text-decoration-none">
-                        <i class="bi-twitter me-2"></i>Twitter
-                    </a>
-                    <a href="#" class="mb-2 text-decoration-none">
-                        <i class="bi-instagram me-2"></i>Instagram
-                    </a>
-                    <a href="#" class="mb-2 text-decoration-none">
-                        <i class="bi-linkedin me-2"></i>LinkedIn
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+</section>
