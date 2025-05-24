@@ -78,23 +78,38 @@ h2.fw-bold {
         height: 200px;
     }
 }
-/* Footer styles */
+
+/* Body và HTML layout */
 html, body {
     height: 100%;
+    margin: 0;
+    padding: 0;
 }
 
-.footer {
-    background-color: #f8f9fa;
+/* Footer styles - ĐÃ SỬA LỖI */
+footer {
+    background-color: #f8f9fa !important;
     color: #6c757d;
     font-size: 0.875rem;
+    margin-top: auto; /* Đẩy footer xuống cuối trang */
 }
 
-    .footer a {
+    footer a {
         color: #6c757d;
         text-decoration: none;
     }
 
-        .footer a:hover {
+        footer a:hover {
             color: #0d6efd;
             text-decoration: underline;
         }
+
+/* Đảm bảo flexbox layout hoạt động đúng */
+.min-vh-100 {
+    min-height: 100vh;
+}
+
+/* Thêm khoảng cách cho nội dung chính */
+main {
+    padding-bottom: 2rem;
+}
