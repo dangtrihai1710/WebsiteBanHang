@@ -33,12 +33,28 @@
                     }
                 </div>
             </div>
+
+            <!-- Product Images Thumbnails (if any) -->
+            @if (Model.Images != null && Model.Images.Any())
+            {
+                <div class="row mt-3">
+                    @foreach (var image in Model.Images.Take(4))
+                    {
+                        <div class="col-3">
+                            <img src="@image.Url" class="img-thumbnail product-thumbnail" alt="@Model.Name"
+                                 data-main-image="@image.Url"
+                                 style="width: 100%; height: 80px; object-fit: cover; cursor: pointer;">
+                        </div>
+                    }
+                </div>
+            }
         </div>
 
         <!-- Product Info -->
         <div class="col-lg-6">
             <div class="mb-3">
                 <span class="badge bg-info">@(Model.Category?.Name ?? "Chưa phân loại")</span>
+                <span class="badge bg-danger ms-2">Hot</span>
             </div>
 
             <h1 class="h2 mb-3">@Model.Name</h1>
@@ -102,7 +118,7 @@
 
             <!-- Action Buttons -->
             <div class="d-grid gap-2 d-md-flex mb-4">
-                <button class="btn btn-primary btn-lg flex-fill" id="addToCart">
+                <button class="btn btn-primary btn-lg flex-fill" id="addToCart" data-product-id="@Model.Id">
                     <i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ hàng
                 </button>
                 <button class="btn btn-success btn-lg flex-fill">
@@ -145,6 +161,17 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Social Share -->
+            <div class="mt-4">
+                <h6>Chia sẻ sản phẩm:</h6>
+                <div class="d-flex">
+                    <a href="#" class="btn btn-outline-primary me-2"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="btn btn-outline-info me-2"><i class="bi bi-twitter"></i></a>
+                    <a href="#" class="btn btn-outline-danger me-2"><i class="bi bi-pinterest"></i></a>
+                    <a href="#" class="btn btn-outline-success"><i class="bi bi-whatsapp"></i></a>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -154,7 +181,7 @@
         <div class="row g-4">
             <!-- Sample related products -->
             <div class="col-lg-3 col-md-6">
-                <div class="card">
+                <div class="card product-card">
                     <img src="/images/placeholder.jpg" class="card-img-top" alt="Related Product" style="height: 200px; object-fit: cover;">
                     <div class="card-body">
                         <h6 class="card-title">Sản phẩm liên quan 1</h6>
@@ -163,7 +190,36 @@
                     </div>
                 </div>
             </div>
-            <!-- Repeat for more related products -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card product-card">
+                    <img src="/images/placeholder.jpg" class="card-img-top" alt="Related Product" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h6 class="card-title">Sản phẩm liên quan 2</h6>
+                        <p class="text-primary fw-bold">1,500,000 VNĐ</p>
+                        <button class="btn btn-outline-primary btn-sm w-100">Xem chi tiết</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card product-card">
+                    <img src="/images/placeholder.jpg" class="card-img-top" alt="Related Product" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h6 class="card-title">Sản phẩm liên quan 3</h6>
+                        <p class="text-primary fw-bold">2,000,000 VNĐ</p>
+                        <button class="btn btn-outline-primary btn-sm w-100">Xem chi tiết</button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="card product-card">
+                    <img src="/images/placeholder.jpg" class="card-img-top" alt="Related Product" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h6 class="card-title">Sản phẩm liên quan 4</h6>
+                        <p class="text-primary fw-bold">2,500,000 VNĐ</p>
+                        <button class="btn btn-outline-primary btn-sm w-100">Xem chi tiết</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -186,6 +242,7 @@
 
             // Add to cart
             $('#addToCart').click(function() {
+                const productId = $(this).data('product-id');
                 const quantity = $('#quantity').val();
                 const button = $(this);
 
@@ -205,7 +262,7 @@
                 }, 1000);
 
                 console.log('Added to cart:', {
-                    productId: @Model.Id,
+                    productId: productId,
                     quantity: quantity
                 });
             });
@@ -215,6 +272,16 @@
                 $(this).toggleClass('btn-outline-secondary btn-danger');
                 const icon = $(this).find('i');
                 icon.toggleClass('bi-heart bi-heart-fill');
+            });
+
+            // Product image thumbnails
+            $('.product-thumbnail').click(function() {
+                const mainImageUrl = $(this).data('main-image');
+                const mainImage = $('.card-body img.img-fluid');
+                mainImage.fadeOut(300, function() {
+                    mainImage.attr('src', mainImageUrl);
+                    mainImage.fadeIn(300);
+                });
             });
         });
     </script>

@@ -37,17 +37,40 @@
             <div class="card">
                 <div class="card-body">
                     <div class="d-flex flex-wrap gap-2">
-                        <a asp-action="Index" class="btn btn-outline-secondary btn-sm">
+                        <a asp-action="Index" class="btn @(ViewBag.CategoryId == null ? "btn-primary" : "btn-outline-secondary") btn-sm">
                             <i class="bi bi-grid me-1"></i>Tất cả
                         </a>
-                        <a asp-action="Category" asp-route-categoryId="1" class="btn btn-outline-secondary btn-sm">
+                        <a asp-action="Category" asp-route-categoryId="1" class="btn @(ViewBag.CategoryId == 1 ? "btn-primary" : "btn-outline-secondary") btn-sm">
                             <i class="bi bi-laptop me-1"></i>Laptop
                         </a>
-                        <a asp-action="Category" asp-route-categoryId="2" class="btn btn-outline-secondary btn-sm">
+                        <a asp-action="Category" asp-route-categoryId="2" class="btn @(ViewBag.CategoryId == 2 ? "btn-primary" : "btn-outline-secondary") btn-sm">
                             <i class="bi bi-phone me-1"></i>Điện thoại
                         </a>
-                        <!-- Thêm các danh mục khác nếu cần -->
+                        <a asp-action="Category" asp-route-categoryId="3" class="btn @(ViewBag.CategoryId == 3 ? "btn-primary" : "btn-outline-secondary") btn-sm">
+                            <i class="bi bi-headset me-1"></i>Phụ kiện
+                        </a>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sorting Options -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted">Hiển thị @Model.Count() sản phẩm</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <label class="me-2">Sắp xếp theo:</label>
+                    <select class="form-select form-select-sm" style="width: 200px;" id="sortOptions">
+                        <option value="newest">Mới nhất</option>
+                        <option value="price-asc">Giá tăng dần</option>
+                        <option value="price-desc">Giá giảm dần</option>
+                        <option value="name-asc">Tên A-Z</option>
+                        <option value="name-desc">Tên Z-A</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -56,84 +79,74 @@
     <!-- Products Grid -->
     @if (Model != null && Model.Any())
     {
-        <div class="row g-4">
+        <div class="row g-4" id="productsGrid">
             @foreach (var item in Model)
             {
-                <div class="col-xl-3 col-lg-4 col-md-6">
-                    <div class="card h-100 product-card">
+                <div class="col-xl-3 col-lg-4 col-md-6 product-item" 
+                     data-price="@item.Price" 
+                     data-name="@item.Name" 
+                     data-id="@item.Id">
+                    <div class="product-card modern-card h-100">
+                        <!-- Product Badges -->
+                        <div class="product-badges">
+                            <span class="badge bg-danger">Hot</span>
+                            <span class="badge bg-success">-20%</span>
+                        </div>
+                        
                         <!-- Product Image -->
-                        <div class="position-relative">
-                            @if (!string.IsNullOrEmpty(item.ImageUrl))
-                            {
-                                <img src="@item.ImageUrl" class="card-img-top" alt="@item.Name" style="height: 250px; object-fit: cover;">
-                            }
-                            else
-                            {
-                                <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 250px;">
-                                    <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                        <div class="product-image-container">
+                            <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "/images/placeholder.jpg" : item.ImageUrl)" 
+                                 class="product-image" alt="@item.Name">
+                            <div class="product-overlay">
+                                <div class="product-actions">
+                                    <a href="@Url.Action("Display", "Product", new { id = item.Id })" 
+                                       class="btn btn-primary btn-sm">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <button class="btn btn-success btn-sm btn-add-cart" data-product-id="@item.Id">
+                                        <i class="bi bi-cart-plus"></i>
+                                    </button>
+                                    <button class="btn btn-outline-primary btn-sm btn-wishlist">
+                                        <i class="bi bi-heart"></i>
+                                    </button>
                                 </div>
-                            }
-                            
-                            <!-- Product Badges -->
-                            <div class="position-absolute top-0 start-0 m-2">
-                                <span class="badge bg-danger">Hot</span>
                             </div>
                         </div>
-
+                        
                         <!-- Product Info -->
-                        <div class="card-body d-flex flex-column">
-                            <div class="mb-2">
-                                <small class="text-muted">@(item.Category?.Name ?? "Chưa phân loại")</small>
-                            </div>
-                            
-                            <h5 class="card-title">@item.Name</h5>
-                            
-                            <p class="card-text text-muted flex-grow-1">
-                                @{
-                                    var shortDescription = item.Description?.Length > 100 ? 
-                                        item.Description.Substring(0, 100) + "..." : item.Description;
-                                }
-                                @shortDescription
-                            </p>
-                            
-                            <!-- Rating -->
-                            <div class="mb-2">
-                                <span class="text-warning">
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star-fill"></i>
-                                    <i class="bi bi-star"></i>
-                                </span>
-                                <small class="text-muted">(4.0)</small>
-                            </div>
-                            
-                            <!-- Price -->
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <div>
-                                    <span class="h5 text-primary fw-bold">@item.Price.ToString("#,##0") VNĐ</span>
-                                    <small class="text-muted text-decoration-line-through ms-2">
-                                        @((item.Price * 1.2m).ToString("#,##0")) VNĐ
-                                    </small>
-                                </div>
-                            </div>
-                            
-                            <!-- Actions -->
-                            <div class="d-grid gap-2">
-                                <a asp-action="Display" asp-route-id="@item.Id" class="btn btn-primary">
-                                    <i class="bi bi-eye me-2"></i>Xem chi tiết
+                        <div class="product-info">
+                            <div class="product-category">@(item.Category?.Name ?? "Chưa phân loại")</div>
+                            <h5 class="product-title">
+                                <a href="@Url.Action("Display", "Product", new { id = item.Id })" class="text-decoration-none text-dark">
+                                    @item.Name
                                 </a>
-                                <button class="btn btn-outline-primary btn-add-cart" data-product-id="@item.Id">
-                                    <i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ
-                                </button>
+                            </h5>
+                            <div class="product-rating mb-2">
+                                <i class="bi bi-star-fill text-warning"></i>
+                                <i class="bi bi-star-fill text-warning"></i>
+                                <i class="bi bi-star-fill text-warning"></i>
+                                <i class="bi bi-star-fill text-warning"></i>
+                                <i class="bi bi-star text-muted"></i>
+                                <span class="rating-text">(4.0)</span>
                             </div>
+                            <div class="product-price">
+                                <span class="price-current">@item.Price.ToString("#,##0") VNĐ</span>
+                                <span class="price-old">@((item.Price * 1.2m).ToString("#,##0")) VNĐ</span>
+                            </div>
+                        </div>
+                        
+                        <!-- Product Footer -->
+                        <div class="product-footer">
+                            <button class="btn btn-primary btn-add-cart w-100" data-product-id="@item.Id">
+                                <i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ
+                            </button>
                         </div>
                     </div>
                 </div>
             }
         </div>
         
-        <!-- Pagination (nếu cần) -->
+        <!-- Pagination -->
         <div class="row mt-5">
             <div class="col-12 text-center">
                 <nav aria-label="Product pagination">
@@ -190,15 +203,57 @@
             
             // Simulate add to cart
             button.html('<i class="bi bi-check me-2"></i>Đã thêm!');
-            button.removeClass('btn-outline-primary').addClass('btn-success');
+            button.removeClass('btn-primary').addClass('btn-success');
             
             setTimeout(() => {
                 button.html('<i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ');
-                button.removeClass('btn-success').addClass('btn-outline-primary');
+                button.removeClass('btn-success').addClass('btn-primary');
+                
+                // Update cart badge
+                const cartBadge = $('.cart-btn .badge');
+                const currentCount = parseInt(cartBadge.text()) || 0;
+                cartBadge.text(currentCount + 1);
             }, 2000);
             
             // Here you would typically send an AJAX request to add the product to cart
             console.log('Added product to cart:', productId);
+        });
+        
+        // Wishlist functionality
+        $('.btn-wishlist').click(function() {
+            $(this).toggleClass('btn-outline-primary btn-danger');
+            const icon = $(this).find('i');
+            icon.toggleClass('bi-heart bi-heart-fill');
+        });
+        
+        // Sorting functionality
+        $('#sortOptions').change(function() {
+            const sortValue = $(this).val();
+            let products = $('.product-item').get();
+            
+            products.sort(function(a, b) {
+                const aVal = $(a);
+                const bVal = $(b);
+                
+                switch(sortValue) {
+                    case 'price-asc':
+                        return parseFloat(aVal.data('price')) - parseFloat(bVal.data('price'));
+                    case 'price-desc':
+                        return parseFloat(bVal.data('price')) - parseFloat(aVal.data('price'));
+                    case 'name-asc':
+                        return aVal.data('name').localeCompare(bVal.data('name'));
+                    case 'name-desc':
+                        return bVal.data('name').localeCompare(aVal.data('name'));
+                    case 'newest':
+                    default:
+                        return parseInt(bVal.data('id')) - parseInt(aVal.data('id'));
+                }
+            });
+            
+            const productGrid = $('#productsGrid');
+            $.each(products, function(index, product) {
+                productGrid.append(product);
+            });
         });
     </script>
 }
