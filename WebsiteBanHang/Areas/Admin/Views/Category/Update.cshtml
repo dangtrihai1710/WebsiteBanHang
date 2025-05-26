@@ -5,7 +5,7 @@
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2><i class="bi bi-pencil-square me-2"></i>Chỉnh sửa danh mục</h2>
-    <a asp-action="Index" class="btn btn-secondary">
+    <a asp-area="Admin" asp-controller="Category" asp-action="Index" class="btn btn-secondary">
         <i class="bi bi-arrow-left me-2"></i>Quay lại danh sách
     </a>
 </div>
@@ -17,7 +17,7 @@
                 <h5 class="card-title mb-0"><i class="bi bi-info-circle me-2"></i>Thông tin danh mục</h5>
             </div>
             <div class="card-body">
-                <form asp-action="Update" method="post">
+                <form asp-area="Admin" asp-controller="Category" asp-action="Update" method="post">
                     <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
                     <input type="hidden" asp-for="Id" />
 
@@ -56,7 +56,7 @@
                     </div>
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                        <a asp-action="Index" class="btn btn-secondary me-md-2">
+                        <a asp-area="Admin" asp-controller="Category" asp-action="Index" class="btn btn-secondary me-md-2">
                             <i class="bi bi-x-circle me-2"></i>Hủy
                         </a>
                         <button type="submit" class="btn btn-warning">
@@ -66,38 +66,6 @@
                 </form>
             </div>
         </div>
-
-        <!-- Impact Warning -->
-        @if (Model.Products != null && Model.Products.Any())
-        {
-            <div class="card card-admin mt-3 border-warning">
-                <div class="card-header bg-warning text-dark">
-                    <h5 class="card-title mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Tác động khi thay đổi</h5>
-                </div>
-                <div class="card-body">
-                    <p class="mb-3">Danh mục này hiện có <strong>@Model.Products.Count sản phẩm</strong>. Khi thay đổi tên sẽ ảnh hưởng:</p>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6 class="text-info"><i class="bi bi-info-circle me-2"></i>Sẽ thay đổi:</h6>
-                            <ul class="list-unstyled">
-                                <li><i class="bi bi-dot"></i>Tên hiển thị trên website</li>
-                                <li><i class="bi bi-dot"></i>URL của danh mục</li>
-                                <li><i class="bi bi-dot"></i>Menu điều hướng</li>
-                                <li><i class="bi bi-dot"></i>Breadcrumb navigation</li>
-                            </ul>
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="text-success"><i class="bi bi-check-circle me-2"></i>Không thay đổi:</h6>
-                            <ul class="list-unstyled">
-                                <li><i class="bi bi-dot"></i>Các sản phẩm trong danh mục</li>
-                                <li><i class="bi bi-dot"></i>Liên kết giữa sản phẩm và danh mục</li>
-                                <li><i class="bi bi-dot"></i>Dữ liệu đã lưu</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        }
     </div>
 
     <div class="col-lg-4">
@@ -114,102 +82,6 @@
                 <p class="text-muted small mb-0">
                     <i class="bi bi-box-seam me-1"></i>@(Model.Products?.Count ?? 0) sản phẩm
                 </p>
-            </div>
-        </div>
-
-        <!-- Current Info -->
-        <div class="card card-admin mt-3">
-            <div class="card-header">
-                <h5 class="card-title mb-0"><i class="bi bi-info-circle me-2"></i>Thông tin hiện tại</h5>
-            </div>
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-muted">Tên cũ:</span>
-                    <span class="fw-bold">@Model.Name</span>
-                </div>
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-muted">ID:</span>
-                    <span class="badge bg-secondary">#@Model.Id</span>
-                </div>
-                <div class="d-flex justify-content-between align-items-center mb-2">
-                    <span class="text-muted">Sản phẩm:</span>
-                    <span class="badge bg-info">@(Model.Products?.Count ?? 0)</span>
-                </div>
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="text-muted">Trạng thái:</span>
-                    @if (Model.Products != null && Model.Products.Any())
-                    {
-                        <span class="badge bg-success">Đang sử dụng</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-warning">Trống</span>
-                    }
-                </div>
-            </div>
-        </div>
-
-        <!-- Products in Category -->
-        @if (Model.Products != null && Model.Products.Any())
-        {
-            <div class="card card-admin mt-3">
-                <div class="card-header">
-                    <h5 class="card-title mb-0"><i class="bi bi-box-seam me-2"></i>Sản phẩm trong danh mục</h5>
-                </div>
-                <div class="card-body">
-                    <div class="list-group list-group-flush">
-                        @foreach (var product in Model.Products.Take(5))
-                        {
-                            <div class="list-group-item border-0 px-0 py-2">
-                                <div class="d-flex align-items-center">
-                                    @if (!string.IsNullOrEmpty(product.ImageUrl))
-                                    {
-                                        <img src="@product.ImageUrl" alt="@product.Name" class="rounded me-3" style="width: 40px; height: 40px; object-fit: cover;">
-                                    }
-                                    else
-                                    {
-                                        <div class="bg-light rounded me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                            <i class="bi bi-image text-muted"></i>
-                                        </div>
-                                    }
-                                    <div class="flex-grow-1">
-                                        <h6 class="mb-0">@product.Name</h6>
-                                        <small class="text-muted">@product.Price.ToString("#,##0") VNĐ</small>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                        @if (Model.Products.Count > 5)
-                        {
-                            <div class="text-center pt-2">
-                                <small class="text-muted">và @(Model.Products.Count - 5) sản phẩm khác...</small>
-                            </div>
-                        }
-                    </div>
-                </div>
-            </div>
-        }
-
-        <!-- Quick Actions -->
-        <div class="card card-admin mt-3">
-            <div class="card-header">
-                <h5 class="card-title mb-0"><i class="bi bi-lightning me-2"></i>Thao tác nhanh</h5>
-            </div>
-            <div class="card-body">
-                <div class="d-grid gap-2">
-                    <a asp-area="Admin" asp-controller="Product" asp-action="Add" class="btn btn-outline-primary btn-sm">
-                        <i class="bi bi-plus-circle me-2"></i>Thêm sản phẩm vào danh mục
-                    </a>
-                    @if (Model.Products == null || !Model.Products.Any())
-                    {
-                        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger btn-sm">
-                            <i class="bi bi-trash me-2"></i>Xóa danh mục trống
-                        </a>
-                    }
-                    <a asp-area="" asp-controller="Product" asp-action="Index" class="btn btn-outline-info btn-sm" target="_blank">
-                        <i class="bi bi-eye me-2"></i>Xem trên website
-                    </a>
-                </div>
             </div>
         </div>
     </div>

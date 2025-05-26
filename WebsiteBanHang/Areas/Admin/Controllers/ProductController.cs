@@ -52,9 +52,10 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
         {
             try
             {
-                // Remove ImageUrl from ModelState validation since it's handled separately
+                // Loại bỏ ImageUrl, Category và Images khỏi ModelState validation
                 ModelState.Remove("ImageUrl");
                 ModelState.Remove("Category");
+                ModelState.Remove("Images");
 
                 if (ModelState.IsValid)
                 {
@@ -68,7 +69,7 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
-                // Reload categories if validation fails
+                // Nếu validation thất bại, tải lại các danh mục
                 var categories = await _categoryRepository.GetAllAsync();
                 ViewBag.Categories = new SelectList(categories, "Id", "Name");
                 return View(product);
@@ -135,8 +136,10 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
 
             try
             {
+                // Loại bỏ các thuộc tính không cần validation
                 ModelState.Remove("ImageUrl");
                 ModelState.Remove("Category");
+                ModelState.Remove("Images");
 
                 if (ModelState.IsValid)
                 {
@@ -147,13 +150,13 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
                         return RedirectToAction(nameof(Index));
                     }
 
-                    // Update properties
+                    // Cập nhật thuộc tính
                     existingProduct.Name = product.Name;
                     existingProduct.Price = product.Price;
                     existingProduct.Description = product.Description;
                     existingProduct.CategoryId = product.CategoryId;
 
-                    // Handle image upload
+                    // Xử lý upload hình ảnh
                     if (imageUrl != null && imageUrl.Length > 0)
                     {
                         existingProduct.ImageUrl = await SaveImage(imageUrl);
@@ -164,7 +167,7 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
-                // Reload categories if validation fails
+                // Tải lại danh mục nếu validation thất bại
                 var categories = await _categoryRepository.GetAllAsync();
                 ViewBag.Categories = new SelectList(categories, "Id", "Name", product.CategoryId);
                 return View(product);
@@ -226,18 +229,18 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
         {
             try
             {
-                // Create images directory if it doesn't exist
+                // Tạo thư mục images nếu chưa tồn tại
                 var imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
                 if (!Directory.Exists(imagesFolder))
                 {
                     Directory.CreateDirectory(imagesFolder);
                 }
 
-                // Generate unique filename
+                // Tạo tên file duy nhất
                 var fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
                 var filePath = Path.Combine(imagesFolder, fileName);
 
-                // Save file
+                // Lưu file
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
                     await image.CopyToAsync(fileStream);

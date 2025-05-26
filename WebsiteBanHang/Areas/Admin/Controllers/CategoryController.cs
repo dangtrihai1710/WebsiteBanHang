@@ -23,7 +23,7 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
         {
             try
             {
-                // Load categories with their products
+                // Tải danh mục kèm theo sản phẩm
                 var categories = await _context.Categories
                     .Include(c => c.Products)
                     .ToListAsync();
@@ -48,9 +48,12 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
         {
             try
             {
+                // Loại bỏ Products khỏi ModelState validation
+                ModelState.Remove("Products");
+
                 if (ModelState.IsValid)
                 {
-                    // Check if category name already exists
+                    // Kiểm tra trùng lặp tên danh mục
                     var existingCategory = await _context.Categories
                         .FirstOrDefaultAsync(c => c.Name.ToLower() == category.Name.ToLower());
 
@@ -107,9 +110,11 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
 
             try
             {
+                ModelState.Remove("Products");
+
                 if (ModelState.IsValid)
                 {
-                    // Check if category name already exists (exclude current category)
+                    // Kiểm tra trùng lặp tên danh mục (loại trừ danh mục hiện tại)
                     var existingCategory = await _context.Categories
                         .FirstOrDefaultAsync(c => c.Name.ToLower() == category.Name.ToLower() && c.Id != id);
 
@@ -127,7 +132,7 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
-                // Reload category with products if validation fails
+                // Tải lại danh mục với sản phẩm nếu validation thất bại
                 var cat = await _context.Categories
                     .Include(c => c.Products)
                     .FirstOrDefaultAsync(c => c.Id == id);
@@ -183,7 +188,7 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
-                // Check if category has products
+                // Kiểm tra xem danh mục có sản phẩm không
                 if (category.Products != null && category.Products.Any())
                 {
                     TempData["ErrorMessage"] = $"Không thể xóa danh mục này vì có {category.Products.Count} sản phẩm đang thuộc về danh mục.";

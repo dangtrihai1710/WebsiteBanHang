@@ -32,6 +32,7 @@ app.UseRouting();
 app.UseAuthorization();
 
 // CẤU HÌNH ROUTING CHO ADMIN AREA - QUAN TRỌNG!
+// Đảm bảo route area đặt trước route mặc định
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
@@ -41,18 +42,11 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-// Tạo database nếu chưa tồn tại
-using (var scope = app.Services.CreateScope())
+// Đảm bảo thư mục tồn tại
+var imagesFolder = Path.Combine(app.Environment.WebRootPath, "images");
+if (!Directory.Exists(imagesFolder))
 {
-    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    try
-    {
-        context.Database.EnsureCreated();
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"Error creating database: {ex.Message}");
-    }
+    Directory.CreateDirectory(imagesFolder);
 }
 
 app.Run();
