@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using WebsiteBanHang.Models;
 using WebsiteBanHang.Repositories;
 
@@ -16,36 +15,11 @@ namespace WebsiteBanHang.Controllers
             _categoryRepository = categoryRepository;
         }
 
+        // Chỉ giữ lại các chức năng xem cho người dùng
         public async Task<IActionResult> Index()
         {
             var products = await _productRepository.GetAllAsync();
             return View(products);
-        }
-
-        public async Task<IActionResult> Add()
-        {
-            var categories = await _categoryRepository.GetAllAsync();
-            ViewBag.Categories = new SelectList(categories, "Id", "Name");
-            return View();
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Add(Product product, IFormFile imageUrl)
-        {
-            if (ModelState.IsValid)
-            {
-                if (imageUrl != null)
-                {
-                    product.ImageUrl = await SaveImage(imageUrl);
-                }
-
-                await _productRepository.AddAsync(product);
-                return RedirectToAction(nameof(Index));
-            }
-
-            var categories = await _categoryRepository.GetAllAsync();
-            ViewBag.Categories = new SelectList(categories, "Id", "Name");
-            return View(product);
         }
 
         public async Task<IActionResult> Display(int id)
@@ -55,95 +29,40 @@ namespace WebsiteBanHang.Controllers
             {
                 return NotFound();
             }
-
             return View(product);
         }
 
-        public async Task<IActionResult> Update(int id)
+        // Tìm kiếm sản phẩm
+        public async Task<IActionResult> Search(string searchTerm)
         {
-            var product = await _productRepository.GetByIdAsync(id);
-            if (product == null)
+            var products = await _productRepository.GetAllAsync();
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                products = products.Where(p =>
+                    p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase) ||
+                    p.Description.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+            }
+
+            ViewBag.SearchTerm = searchTerm;
+            return View("Index", products);
+        }
+
+        // Lọc theo danh mục
+        public async Task<IActionResult> Category(int categoryId)
+        {
+            var products = await _productRepository.GetAllAsync();
+            var category = await _categoryRepository.GetByIdAsync(categoryId);
+
+            if (category == null)
             {
                 return NotFound();
             }
 
-            var categories = await _categoryRepository.GetAllAsync();
-            ViewBag.Categories = new SelectList(categories, "Id", "Name", product.CategoryId);
-            return View(product);
-        }
+            products = products.Where(p => p.CategoryId == categoryId);
+            ViewBag.CategoryName = category.Name;
 
-        [HttpPost]
-        public async Task<IActionResult> Update(int id, Product product, IFormFile imageUrl)
-        {
-            ModelState.Remove("ImageUrl");
-
-            if (id != product.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                var existingProduct = await _productRepository.GetByIdAsync(id);
-
-                if (imageUrl == null)
-                {
-                    product.ImageUrl = existingProduct.ImageUrl;
-                }
-                else
-                {
-                    product.ImageUrl = await SaveImage(imageUrl);
-                }
-
-                existingProduct.Name = product.Name;
-                existingProduct.Price = product.Price;
-                existingProduct.Description = product.Description;
-                existingProduct.CategoryId = product.CategoryId;
-                existingProduct.ImageUrl = product.ImageUrl;
-
-                await _productRepository.UpdateAsync(existingProduct);
-                return RedirectToAction(nameof(Index));
-            }
-
-            var categories = await _categoryRepository.GetAllAsync();
-            ViewBag.Categories = new SelectList(categories, "Id", "Name");
-            return View(product);
-        }
-
-        public async Task<IActionResult> Delete(int id)
-        {
-            var product = await _productRepository.GetByIdAsync(id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return View(product);
-        }
-
-        [HttpPost, ActionName("DeleteConfirmed")]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            await _productRepository.DeleteAsync(id);
-            return RedirectToAction(nameof(Index));
-        }
-
-        private async Task<string> SaveImage(IFormFile image)
-        {
-            // Đảm bảo thư mục images tồn tại
-            var imagesFolder = Path.Combine("wwwroot", "images");
-            if (!Directory.Exists(imagesFolder))
-            {
-                Directory.CreateDirectory(imagesFolder);
-            }
-
-            var savePath = Path.Combine(imagesFolder, image.FileName);
-            using (var fileStream = new FileStream(savePath, FileMode.Create))
-            {
-                await image.CopyToAsync(fileStream);
-            }
-
-            return "/images/" + image.FileName;
+            return View("Index", products);
         }
     }
 }

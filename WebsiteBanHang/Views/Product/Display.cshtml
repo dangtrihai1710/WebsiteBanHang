@@ -1,33 +1,221 @@
 ﻿@model WebsiteBanHang.Models.Product
 @{
-    ViewData["Title"] = "Chi tiết sản phẩm";
+    ViewData["Title"] = Model.Name;
 }
 
-<h2>Chi tiết sản phẩm</h2>
+<div class="container py-4">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a asp-action="Index">Sản phẩm</a></li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Name</li>
+        </ol>
+    </nav>
 
-<div class="card">
-    <div class="row g-0">
-        <div class="col-md-4">
-            @if (!string.IsNullOrEmpty(Model.ImageUrl))
-            {
-                <img src="@Model.ImageUrl" class="img-fluid rounded-start" alt="@Model.Name">
-            }
-            else
-            {
-                <div class="text-center p-5 bg-light">Không có hình ảnh</div>
-            }
+    <div class="row">
+        <!-- Product Images -->
+        <div class="col-lg-6 mb-4">
+            <div class="card">
+                <div class="card-body text-center">
+                    @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                    {
+                        <img src="@Model.ImageUrl" class="img-fluid rounded" alt="@Model.Name" style="max-height: 500px;">
+                    }
+                    else
+                    {
+                        <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 500px;">
+                            <div class="text-center">
+                                <i class="bi bi-image text-muted" style="font-size: 4rem;"></i>
+                                <p class="text-muted mt-2">Chưa có hình ảnh</p>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
         </div>
-        <div class="col-md-8">
-            <div class="card-body">
-                <h5 class="card-title">@Model.Name</h5>
-                <p class="card-text"><strong>Giá:</strong> @Model.Price.ToString("#,##0") VNĐ</p>
-                <p class="card-text"><strong>Danh mục:</strong> @Model.Category?.Name</p>
-                <p class="card-text"><strong>Mô tả:</strong> @Model.Description</p>
-                <div class="mt-3">
-                    <a asp-action="Update" asp-route-id="@Model.Id" class="btn btn-warning">Chỉnh sửa</a>
-                    <a asp-action="Index" class="btn btn-secondary">Quay lại danh sách</a>
+
+        <!-- Product Info -->
+        <div class="col-lg-6">
+            <div class="mb-3">
+                <span class="badge bg-info">@(Model.Category?.Name ?? "Chưa phân loại")</span>
+            </div>
+
+            <h1 class="h2 mb-3">@Model.Name</h1>
+
+            <!-- Rating -->
+            <div class="mb-3">
+                <span class="text-warning me-2">
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star-fill"></i>
+                    <i class="bi bi-star"></i>
+                </span>
+                <span class="text-muted">(4.0) • 125 đánh giá</span>
+            </div>
+
+            <!-- Price -->
+            <div class="mb-4">
+                <div class="d-flex align-items-center">
+                    <span class="h3 text-primary fw-bold me-3">@Model.Price.ToString("#,##0") VNĐ</span>
+                    <span class="text-muted text-decoration-line-through">
+                        @((Model.Price * 1.2m).ToString("#,##0")) VNĐ
+                    </span>
+                    <span class="badge bg-danger ms-2">-20%</span>
+                </div>
+                <small class="text-success">
+                    <i class="bi bi-check-circle me-1"></i>Còn hàng
+                </small>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-4">
+                <h5>Mô tả sản phẩm</h5>
+                <div class="bg-light p-3 rounded">
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                        <p class="mb-0">@Model.Description</p>
+                    }
+                    else
+                    {
+                        <p class="mb-0 text-muted fst-italic">Chưa có mô tả chi tiết</p>
+                    }
+                </div>
+            </div>
+
+            <!-- Quantity Selector -->
+            <div class="mb-4">
+                <div class="row align-items-center">
+                    <div class="col-auto">
+                        <label class="form-label mb-0">Số lượng:</label>
+                    </div>
+                    <div class="col-auto">
+                        <div class="input-group" style="width: 150px;">
+                            <button class="btn btn-outline-secondary" type="button" id="decreaseQty">-</button>
+                            <input type="number" class="form-control text-center" value="1" min="1" id="quantity">
+                            <button class="btn btn-outline-secondary" type="button" id="increaseQty">+</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="d-grid gap-2 d-md-flex mb-4">
+                <button class="btn btn-primary btn-lg flex-fill" id="addToCart">
+                    <i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ hàng
+                </button>
+                <button class="btn btn-success btn-lg flex-fill">
+                    <i class="bi bi-credit-card me-2"></i>Mua ngay
+                </button>
+                <button class="btn btn-outline-secondary" id="addToWishlist">
+                    <i class="bi bi-heart"></i>
+                </button>
+            </div>
+
+            <!-- Features -->
+            <div class="card bg-light">
+                <div class="card-body">
+                    <h6 class="card-title">Chính sách bán hàng</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-truck text-primary me-2"></i>
+                                <small>Miễn phí vận chuyển</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-arrow-clockwise text-success me-2"></i>
+                                <small>Đổi trả trong 7 ngày</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-shield-check text-info me-2"></i>
+                                <small>Bảo hành chính hãng</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-headset text-warning me-2"></i>
+                                <small>Hỗ trợ 24/7</small>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Related Products -->
+    <div class="mt-5">
+        <h3 class="mb-4">Sản phẩm liên quan</h3>
+        <div class="row g-4">
+            <!-- Sample related products -->
+            <div class="col-lg-3 col-md-6">
+                <div class="card">
+                    <img src="/images/placeholder.jpg" class="card-img-top" alt="Related Product" style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+                        <h6 class="card-title">Sản phẩm liên quan 1</h6>
+                        <p class="text-primary fw-bold">1,000,000 VNĐ</p>
+                        <button class="btn btn-outline-primary btn-sm w-100">Xem chi tiết</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Repeat for more related products -->
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Quantity controls
+            $('#increaseQty').click(function() {
+                let qty = parseInt($('#quantity').val());
+                $('#quantity').val(qty + 1);
+            });
+
+            $('#decreaseQty').click(function() {
+                let qty = parseInt($('#quantity').val());
+                if (qty > 1) {
+                    $('#quantity').val(qty - 1);
+                }
+            });
+
+            // Add to cart
+            $('#addToCart').click(function() {
+                const quantity = $('#quantity').val();
+                const button = $(this);
+
+                // Simulate API call
+                button.html('<span class="spinner-border spinner-border-sm me-2"></span>Đang thêm...');
+                button.prop('disabled', true);
+
+                setTimeout(() => {
+                    button.html('<i class="bi bi-check me-2"></i>Đã thêm vào giỏ!');
+                    button.removeClass('btn-primary').addClass('btn-success');
+
+                    setTimeout(() => {
+                        button.html('<i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ hàng');
+                        button.removeClass('btn-success').addClass('btn-primary');
+                        button.prop('disabled', false);
+                    }, 2000);
+                }, 1000);
+
+                console.log('Added to cart:', {
+                    productId: @Model.Id,
+                    quantity: quantity
+                });
+            });
+
+            // Add to wishlist
+            $('#addToWishlist').click(function() {
+                $(this).toggleClass('btn-outline-secondary btn-danger');
+                const icon = $(this).find('i');
+                icon.toggleClass('bi-heart bi-heart-fill');
+            });
+        });
+    </script>
+}
