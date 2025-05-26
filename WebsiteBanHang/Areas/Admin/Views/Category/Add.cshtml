@@ -1,0 +1,168 @@
+﻿@model WebsiteBanHang.Models.Category
+@{
+    ViewData["Title"] = "Thêm danh mục mới";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-plus-circle me-2"></i>Thêm danh mục mới</h2>
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Quay lại danh sách
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card card-admin">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="bi bi-info-circle me-2"></i>Thông tin danh mục</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="Add" method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert"></div>
+
+                    <div class="mb-4">
+                        <label asp-for="Name" class="form-label">
+                            Tên danh mục <span class="text-danger">*</span>
+                        </label>
+                        <input asp-for="Name" class="form-control form-control-lg" placeholder="Nhập tên danh mục..."
+                               id="categoryName" autocomplete="off" />
+                        <span asp-validation-for="Name" class="text-danger"></span>
+                        <div class="form-text">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Tên danh mục nên ngắn gọn, dễ hiểu và thể hiện rõ loại sản phẩm
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Xem trước URL</label>
+                        <div class="input-group">
+                            <span class="input-group-text">website.com/category/</span>
+                            <input type="text" class="form-control" id="urlPreview" readonly placeholder="url-danh-muc">
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a asp-action="Index" class="btn btn-secondary me-md-2">
+                            <i class="bi bi-x-circle me-2"></i>Hủy
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-2"></i>Tạo danh mục
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Preview Card -->
+        <div class="card card-admin">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="bi bi-eye me-2"></i>Xem trước</h5>
+            </div>
+            <div class="card-body text-center">
+                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white mx-auto mb-3" style="width: 80px; height: 80px;" id="previewIcon">
+                    <i class="bi bi-tag-fill fs-1"></i>
+                </div>
+                <h5 id="previewName" class="text-muted">Tên danh mục sẽ hiển thị ở đây</h5>
+                <p class="text-muted small mb-0">
+                    <i class="bi bi-box-seam me-1"></i>0 sản phẩm
+                </p>
+            </div>
+        </div>
+
+        <!-- Guidelines -->
+        <div class="card card-admin mt-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="bi bi-lightbulb me-2"></i>Hướng dẫn</h5>
+            </div>
+            <div class="card-body">
+                <h6 class="text-success"><i class="bi bi-check-circle me-2"></i>Nên:</h6>
+                <ul class="list-unstyled mb-3">
+                    <li><i class="bi bi-dot"></i>Sử dụng tên ngắn gọn, rõ ràng</li>
+                    <li><i class="bi bi-dot"></i>Thể hiện đúng loại sản phẩm</li>
+                    <li><i class="bi bi-dot"></i>Dễ tìm kiếm và nhớ</li>
+                    <li><i class="bi bi-dot"></i>Phù hợp với khách hàng mục tiêu</li>
+                </ul>
+
+                <h6 class="text-danger"><i class="bi bi-x-circle me-2"></i>Tránh:</h6>
+                <ul class="list-unstyled mb-0">
+                    <li><i class="bi bi-dot"></i>Tên quá dài hoặc phức tạp</li>
+                    <li><i class="bi bi-dot"></i>Ký tự đặc biệt không cần thiết</li>
+                    <li><i class="bi bi-dot"></i>Trùng lặp với danh mục khác</li>
+                    <li><i class="bi bi-dot"></i>Tên không liên quan đến sản phẩm</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Examples -->
+        <div class="card card-admin mt-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="bi bi-collection me-2"></i>Ví dụ</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2">
+                    <span class="badge bg-light text-dark border example-tag" data-name="Laptop">Laptop</span>
+                    <span class="badge bg-light text-dark border example-tag" data-name="Điện thoại">Điện thoại</span>
+                    <span class="badge bg-light text-dark border example-tag" data-name="Phụ kiện">Phụ kiện</span>
+                    <span class="badge bg-light text-dark border example-tag" data-name="Máy tính bảng">Máy tính bảng</span>
+                    <span class="badge bg-light text-dark border example-tag" data-name="Smartwatch">Smartwatch</span>
+                    <span class="badge bg-light text-dark border example-tag" data-name="Tai nghe">Tai nghe</span>
+                </div>
+                <small class="text-muted d-block mt-2">Click vào ví dụ để áp dụng</small>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function() {
+            // Update preview when typing
+            $('#categoryName').on('input', function() {
+                const name = $(this).val() || 'Tên danh mục sẽ hiển thị ở đây';
+                $('#previewName').text(name);
+
+                // Update URL preview
+                const url = name.toLowerCase()
+                    .replace(/[^a-z0-9\s]/g, '')
+                    .replace(/\s+/g, '-')
+                    .replace(/-+/g, '-')
+                    .replace(/^-|-$/g, '');
+                $('#urlPreview').val(url || 'url-danh-muc');
+
+                // Update icon letter
+                if (name && name.trim()) {
+                    $('#previewIcon').html(`<strong style="font-size: 2rem;">${name.charAt(0).toUpperCase()}</strong>`);
+                } else {
+                    $('#previewIcon').html('<i class="bi bi-tag-fill fs-1"></i>');
+                }
+            });
+
+            // Example tags click
+            $('.example-tag').click(function() {
+                const name = $(this).data('name');
+                $('#categoryName').val(name).trigger('input').focus();
+            });
+
+            // Auto focus
+            $('#categoryName').focus();
+        });
+    </script>
+
+    <style>
+        .example-tag {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+            .example-tag:hover {
+                background-color: #0d6efd !important;
+                color: white !important;
+                transform: translateY(-2px);
+            }
+    </style>
+}

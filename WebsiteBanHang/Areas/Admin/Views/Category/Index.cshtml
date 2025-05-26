@@ -1,0 +1,223 @@
+﻿@model IEnumerable<WebsiteBanHang.Models.Category>
+@{
+    ViewData["Title"] = "Quản lý danh mục";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-tags me-2"></i>Quản lý danh mục</h2>
+    <a asp-action="Add" class="btn btn-primary btn-admin">
+        <i class="bi bi-plus-circle me-2"></i>Thêm danh mục mới
+    </a>
+</div>
+
+<div class="row mb-4">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card card-admin bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">Tổng danh mục</h6>
+                        <h2 class="mb-0">@Model.Count()</h2>
+                    </div>
+                    <i class="bi bi-tags" style="font-size: 2rem; opacity: 0.7;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card card-admin bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">Có sản phẩm</h6>
+                        <h2 class="mb-0">@Model.Count(c => c.Products != null && c.Products.Any())</h2>
+                    </div>
+                    <i class="bi bi-box-seam" style="font-size: 2rem; opacity: 0.7;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card card-admin bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">Trống</h6>
+                        <h2 class="mb-0">@Model.Count(c => c.Products == null || !c.Products.Any())</h2>
+                    </div>
+                    <i class="bi bi-inbox" style="font-size: 2rem; opacity: 0.7;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card card-admin bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">Mới nhất</h6>
+                        <h2 class="mb-0">#@(Model.Any() ? Model.Max(c => c.Id) : 0)</h2>
+                    </div>
+                    <i class="bi bi-star" style="font-size: 2rem; opacity: 0.7;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card card-admin">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0"><i class="bi bi-list me-2"></i>Danh sách danh mục</h5>
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-secondary btn-sm" id="gridView">
+                    <i class="bi bi-grid"></i> Lưới
+                </button>
+                <button type="button" class="btn btn-outline-secondary btn-sm active" id="listView">
+                    <i class="bi bi-list"></i> Danh sách
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        <!-- List View -->
+        <div id="listViewContent">
+            <div class="table-responsive">
+                <table class="table table-hover" id="categoryTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Tên danh mục</th>
+                            <th>Số sản phẩm</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    <span class="badge bg-secondary">#@item.Id</span>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white me-3" style="width: 40px; height: 40px;">
+                                            <strong>@item.Name.Substring(0, 1).ToUpper()</strong>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">@item.Name</h6>
+                                            <small class="text-muted">Danh mục sản phẩm</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">@(item.Products?.Count ?? 0) sản phẩm</span>
+                                </td>
+                                <td>
+                                    @if (item.Products != null && item.Products.Any())
+                                    {
+                                        <span class="badge bg-success">
+                                            <i class="bi bi-check-circle me-1"></i>Có sản phẩm
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-warning">
+                                            <i class="bi bi-exclamation-circle me-1"></i>Trống
+                                        </span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Update" asp-route-id="@item.Id" class="btn btn-warning btn-sm" title="Chỉnh sửa">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm" title="Xóa">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Grid View -->
+        <div id="gridViewContent" style="display: none;">
+            <div class="row">
+                @foreach (var item in Model)
+                {
+                    <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                        <div class="card card-admin h-100">
+                            <div class="card-body text-center">
+                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center text-white mx-auto mb-3" style="width: 60px; height: 60px;">
+                                    <i class="bi bi-tag-fill fs-4"></i>
+                                </div>
+                                <h5 class="card-title">@item.Name</h5>
+                                <p class="text-muted mb-3">
+                                    <i class="bi bi-box-seam me-1"></i>
+                                    @(item.Products?.Count ?? 0) sản phẩm
+                                </p>
+                                @if (item.Products != null && item.Products.Any())
+                                {
+                                    <span class="badge bg-success mb-3">Có sản phẩm</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-warning mb-3">Trống</span>
+                                }
+                            </div>
+                            <div class="card-footer bg-transparent border-top-0">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <a asp-action="Update" asp-route-id="@item.Id" class="btn btn-warning btn-sm">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Initialize DataTable
+            $('#categoryTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Vietnamese.json"
+                },
+                "responsive": true,
+                "pageLength": 10,
+                "order": [[0, "desc"]]
+            });
+
+            // View toggle
+            $('#gridView').click(function() {
+                $(this).addClass('active');
+                $('#listView').removeClass('active');
+                $('#listViewContent').hide();
+                $('#gridViewContent').show();
+            });
+
+            $('#listView').click(function() {
+                $(this).addClass('active');
+                $('#gridView').removeClass('active');
+                $('#gridViewContent').hide();
+                $('#listViewContent').show();
+            });
+        });
+    </script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script>
+}

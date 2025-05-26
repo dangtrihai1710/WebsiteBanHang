@@ -1,0 +1,313 @@
+﻿@model WebsiteBanHang.Models.Category
+@{
+    ViewData["Title"] = "Xóa danh mục";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-exclamation-triangle text-danger me-2"></i>Xác nhận xóa danh mục</h2>
+    <a asp-action="Index" class="btn btn-secondary">
+        <i class="bi bi-arrow-left me-2"></i>Quay lại danh sách
+    </a>
+</div>
+
+@if (Model.Products != null && Model.Products.Any())
+{
+    <!-- Cannot Delete Warning -->
+    <div class="alert alert-danger" role="alert">
+        <div class="d-flex">
+            <div class="me-3">
+                <i class="bi bi-shield-x fs-4"></i>
+            </div>
+            <div>
+                <h5 class="alert-heading">Không thể xóa danh mục!</h5>
+                <p class="mb-0">
+                    Danh mục này hiện có <strong>@Model.Products.Count sản phẩm</strong>.
+                    Bạn cần di chuyển hoặc xóa tất cả sản phẩm trước khi có thể xóa danh mục.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card card-admin border-danger">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="card-title mb-0"><i class="bi bi-info-circle me-2"></i>Thông tin danh mục</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Tên danh mục</label>
+                            <p class="fs-5 fw-bold">@Model.Name</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">ID danh mục</label>
+                            <p class="fs-5 fw-bold text-primary">#@Model.Id</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Số sản phẩm</label>
+                        <p><span class="badge bg-danger fs-6">@Model.Products.Count sản phẩm</span></p>
+                    </div>
+
+                    <div class="border-top pt-3">
+                        <h6 class="text-danger"><i class="bi bi-exclamation-circle me-2"></i>Để xóa danh mục này, bạn cần:</h6>
+                        <ol class="text-muted">
+                            <li>Di chuyển tất cả sản phẩm sang danh mục khác, HOẶC</li>
+                            <li>Xóa tất cả sản phẩm trong danh mục này</li>
+                            <li>Sau đó quay lại để xóa danh mục</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products List -->
+            <div class="card card-admin mt-3">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="bi bi-box-seam me-2"></i>Sản phẩm trong danh mục (@Model.Products.Count)</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Hình ảnh</th>
+                                    <th>Tên sản phẩm</th>
+                                    <th>Giá</th>
+                                    <th>Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var product in Model.Products.Take(10))
+                                {
+                                    <tr>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                            {
+                                                <img src="@product.ImageUrl" alt="@product.Name" class="rounded" style="width: 40px; height: 40px; object-fit: cover;">
+                                            }
+                                            else
+                                            {
+                                                <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                    <i class="bi bi-image text-muted"></i>
+                                                </div>
+                                            }
+                                        </td>
+                                        <td>
+                                            <strong>@product.Name</strong>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-success">@product.Price.ToString("#,##0") VNĐ</span>
+                                        </td>
+                                        <td>
+                                            <a asp-area="Admin" asp-controller="Product" asp-action="Update" asp-route-id="@product.Id" class="btn btn-warning btn-sm" title="Chỉnh sửa">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                        @if (Model.Products.Count > 10)
+                        {
+                            <div class="text-center">
+                                <small class="text-muted">và @(Model.Products.Count - 10) sản phẩm khác...</small>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="card card-admin mt-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-center gap-3">
+                        <a asp-action="Index" class="btn btn-secondary btn-lg">
+                            <i class="bi bi-arrow-left me-2"></i>Quay lại danh sách
+                        </a>
+                        <a asp-action="Update" asp-route-id="@Model.Id" class="btn btn-warning btn-lg">
+                            <i class="bi bi-pencil me-2"></i>Chỉnh sửa danh mục
+                        </a>
+                        <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="btn btn-info btn-lg">
+                            <i class="bi bi-box-seam me-2"></i>Quản lý sản phẩm
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Category Preview -->
+            <div class="card card-admin border-danger">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0 text-danger"><i class="bi bi-tag me-2"></i>Danh mục không thể xóa</h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="bg-danger rounded-circle d-flex align-items-center justify-content-center text-white mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="bi bi-tag-fill fs-1"></i>
+                    </div>
+                    <h5>@Model.Name</h5>
+                    <p class="text-danger mb-0">
+                        <i class="bi bi-box-seam me-1"></i>
+                        @Model.Products.Count sản phẩm
+                    </p>
+                </div>
+            </div>
+
+            <!-- Solutions -->
+            <div class="card card-admin mt-3 border-info">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0"><i class="bi bi-lightbulb me-2"></i>Giải pháp</h5>
+                </div>
+                <div class="card-body">
+                    <h6 class="text-primary">Tùy chọn 1: Di chuyển sản phẩm</h6>
+                    <p class="small text-muted mb-3">Chỉnh sửa từng sản phẩm và thay đổi danh mục của chúng.</p>
+
+                    <h6 class="text-warning">Tùy chọn 2: Xóa sản phẩm</h6>
+                    <p class="small text-muted mb-3">Xóa tất cả sản phẩm trong danh mục (cẩn thận!).</p>
+
+                    <h6 class="text-success">Khuyến nghị</h6>
+                    <p class="small text-muted mb-0">Nên di chuyển sản phẩm thay vì xóa để tránh mất dữ liệu.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <!-- Can Delete -->
+    <div class="alert alert-warning" role="alert">
+        <div class="d-flex">
+            <div class="me-3">
+                <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+            </div>
+            <div>
+                <h5 class="alert-heading">Cảnh báo!</h5>
+                <p class="mb-0">
+                    Bạn có chắc chắn muốn xóa danh mục "<strong>@Model.Name</strong>" không?
+                    <strong>Hành động này không thể hoàn tác.</strong>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card card-admin border-warning">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="card-title mb-0"><i class="bi bi-info-circle me-2"></i>Thông tin danh mục sẽ bị xóa</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Tên danh mục</label>
+                            <p class="fs-5 fw-bold">@Model.Name</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">ID danh mục</label>
+                            <p class="fs-5 fw-bold text-primary">#@Model.Id</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Trạng thái</label>
+                        <p><span class="badge bg-success fs-6">Danh mục trống - An toàn để xóa</span></p>
+                    </div>
+
+                    <div class="border-top pt-3">
+                        <h6 class="text-warning"><i class="bi bi-exclamation-circle me-2"></i>Lưu ý quan trọng:</h6>
+                        <ul class="text-muted mb-0">
+                            <li>Danh mục sẽ bị xóa vĩnh viễn khỏi hệ thống</li>
+                            <li>Không ảnh hưởng đến sản phẩm khác</li>
+                            <li>Menu website sẽ được cập nhật tự động</li>
+                            <li>Hành động này không thể hoàn tác</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Confirmation Form -->
+            <div class="card card-admin mt-3 border-danger">
+                <div class="card-body">
+                    <form asp-action="DeleteConfirmed" method="post">
+                        <input type="hidden" asp-for="Id" />
+
+                        <div class="d-flex justify-content-center gap-3">
+                            <a asp-action="Index" class="btn btn-secondary btn-lg">
+                                <i class="bi bi-x-circle me-2"></i>Hủy bỏ
+                            </a>
+                            <a asp-action="Update" asp-route-id="@Model.Id" class="btn btn-warning btn-lg">
+                                <i class="bi bi-pencil me-2"></i>Chỉnh sửa thay vì xóa
+                            </a>
+                            <button type="submit" class="btn btn-danger btn-lg" onclick="return confirm('Bạn có thực sự chắc chắn muốn xóa danh mục @Model.Name?')">
+                                <i class="bi bi-trash me-2"></i>Xác nhận xóa
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Category Preview -->
+            <div class="card card-admin border-warning">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0 text-warning"><i class="bi bi-tag me-2"></i>Danh mục sẽ bị xóa</h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="position-relative">
+                        <div class="bg-warning rounded-circle d-flex align-items-center justify-content-center text-white mx-auto mb-3 opacity-75" style="width: 80px; height: 80px;">
+                            <strong style="font-size: 2rem;">@Model.Name.Substring(0, 1).ToUpper()</strong>
+                        </div>
+                        <div class="position-absolute top-50 start-50 translate-middle">
+                            <i class="bi bi-x-circle-fill text-danger" style="font-size: 2rem; opacity: 0.9;"></i>
+                        </div>
+                    </div>
+                    <h5>@Model.Name</h5>
+                    <p class="text-success mb-0">
+                        <i class="bi bi-check-circle me-1"></i>
+                        Trống - An toàn để xóa
+                    </p>
+                </div>
+            </div>
+
+            <!-- Safe to Delete Info -->
+            <div class="card card-admin mt-3 border-success">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0"><i class="bi bi-shield-check me-2"></i>An toàn để xóa</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-check-circle text-success me-2"></i>
+                        <span class="text-success">Không có sản phẩm nào</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-check-circle text-success me-2"></i>
+                        <span class="text-success">Không ảnh hưởng dữ liệu khác</span>
+                    </div>
+                    <div class="d-flex align-items-center mb-2">
+                        <i class="bi bi-check-circle text-success me-2"></i>
+                        <span class="text-success">Menu tự động cập nhật</span>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <i class="bi bi-exclamation-triangle text-warning me-2"></i>
+                        <span class="text-warning">Không thể khôi phục</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        // Enhanced confirmation dialog
+        document.querySelector('form')?.addEventListener('submit', function(e) {
+            const categoryName = '@Model.Name';
+            if (!confirm(`⚠️ CẢNH BÁO: Bạn có thực sự chắc chắn muốn xóa danh mục "${categoryName}"?\n\nHành động này KHÔNG THỂ HOÀN TÁC!`)) {
+                e.preventDefault();
+            }
+        });
+    </script>
+}
