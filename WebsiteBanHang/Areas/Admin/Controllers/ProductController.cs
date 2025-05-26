@@ -19,134 +19,236 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
 
         public async Task<IActionResult> Index()
         {
-            var products = await _productRepository.GetAllAsync();
-            return View(products);
+            try
+            {
+                var products = await _productRepository.GetAllAsync();
+                return View(products);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Lỗi khi tải danh sách sản phẩm: " + ex.Message;
+                return View(new List<Product>());
+            }
         }
 
         public async Task<IActionResult> Add()
         {
-            var categories = await _categoryRepository.GetAllAsync();
-            ViewBag.Categories = new SelectList(categories, "Id", "Name");
-            return View();
+            try
+            {
+                var categories = await _categoryRepository.GetAllAsync();
+                ViewBag.Categories = new SelectList(categories, "Id", "Name");
+                return View();
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Lỗi khi tải form thêm sản phẩm: " + ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Add(Product product, IFormFile imageUrl)
         {
-            if (ModelState.IsValid)
+            try
             {
-                if (imageUrl != null)
+                // Remove ImageUrl from ModelState validation since it's handled separately
+                ModelState.Remove("ImageUrl");
+                ModelState.Remove("Category");
+
+                if (ModelState.IsValid)
                 {
-                    product.ImageUrl = await SaveImage(imageUrl);
+                    if (imageUrl != null && imageUrl.Length > 0)
+                    {
+                        product.ImageUrl = await SaveImage(imageUrl);
+                    }
+
+                    await _productRepository.AddAsync(product);
+                    TempData["SuccessMessage"] = "Thêm sản phẩm thành công!";
+                    return RedirectToAction(nameof(Index));
                 }
 
-                await _productRepository.AddAsync(product);
-                TempData["SuccessMessage"] = "Thêm sản phẩm thành công!";
-                return RedirectToAction(nameof(Index));
+                // Reload categories if validation fails
+                var categories = await _categoryRepository.GetAllAsync();
+                ViewBag.Categories = new SelectList(categories, "Id", "Name");
+                return View(product);
             }
-
-            var categories = await _categoryRepository.GetAllAsync();
-            ViewBag.Categories = new SelectList(categories, "Id", "Name");
-            return View(product);
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Lỗi khi thêm sản phẩm: " + ex.Message;
+                var categories = await _categoryRepository.GetAllAsync();
+                ViewBag.Categories = new SelectList(categories, "Id", "Name");
+                return View(product);
+            }
         }
 
         public async Task<IActionResult> Display(int id)
         {
-            var product = await _productRepository.GetByIdAsync(id);
-            if (product == null)
+            try
             {
-                return NotFound();
+                var product = await _productRepository.GetByIdAsync(id);
+                if (product == null)
+                {
+                    TempData["ErrorMessage"] = "Không tìm thấy sản phẩm!";
+                    return RedirectToAction(nameof(Index));
+                }
+                return View(product);
             }
-
-            return View(product);
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Lỗi khi tải chi tiết sản phẩm: " + ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         public async Task<IActionResult> Update(int id)
         {
-            var product = await _productRepository.GetByIdAsync(id);
-            if (product == null)
+            try
             {
-                return NotFound();
-            }
+                var product = await _productRepository.GetByIdAsync(id);
+                if (product == null)
+                {
+                    TempData["ErrorMessage"] = "Không tìm thấy sản phẩm!";
+                    return RedirectToAction(nameof(Index));
+                }
 
-            var categories = await _categoryRepository.GetAllAsync();
-            ViewBag.Categories = new SelectList(categories, "Id", "Name", product.CategoryId);
-            return View(product);
+                var categories = await _categoryRepository.GetAllAsync();
+                ViewBag.Categories = new SelectList(categories, "Id", "Name", product.CategoryId);
+                return View(product);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Lỗi khi tải form cập nhật: " + ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update(int id, Product product, IFormFile imageUrl)
         {
-            ModelState.Remove("ImageUrl");
-
             if (id != product.Id)
             {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                var existingProduct = await _productRepository.GetByIdAsync(id);
-
-                if (imageUrl == null)
-                {
-                    product.ImageUrl = existingProduct.ImageUrl;
-                }
-                else
-                {
-                    product.ImageUrl = await SaveImage(imageUrl);
-                }
-
-                existingProduct.Name = product.Name;
-                existingProduct.Price = product.Price;
-                existingProduct.Description = product.Description;
-                existingProduct.CategoryId = product.CategoryId;
-                existingProduct.ImageUrl = product.ImageUrl;
-
-                await _productRepository.UpdateAsync(existingProduct);
-                TempData["SuccessMessage"] = "Cập nhật sản phẩm thành công!";
+                TempData["ErrorMessage"] = "ID sản phẩm không hợp lệ!";
                 return RedirectToAction(nameof(Index));
             }
 
-            var categories = await _categoryRepository.GetAllAsync();
-            ViewBag.Categories = new SelectList(categories, "Id", "Name");
-            return View(product);
+            try
+            {
+                ModelState.Remove("ImageUrl");
+                ModelState.Remove("Category");
+
+                if (ModelState.IsValid)
+                {
+                    var existingProduct = await _productRepository.GetByIdAsync(id);
+                    if (existingProduct == null)
+                    {
+                        TempData["ErrorMessage"] = "Không tìm thấy sản phẩm!";
+                        return RedirectToAction(nameof(Index));
+                    }
+
+                    // Update properties
+                    existingProduct.Name = product.Name;
+                    existingProduct.Price = product.Price;
+                    existingProduct.Description = product.Description;
+                    existingProduct.CategoryId = product.CategoryId;
+
+                    // Handle image upload
+                    if (imageUrl != null && imageUrl.Length > 0)
+                    {
+                        existingProduct.ImageUrl = await SaveImage(imageUrl);
+                    }
+
+                    await _productRepository.UpdateAsync(existingProduct);
+                    TempData["SuccessMessage"] = "Cập nhật sản phẩm thành công!";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                // Reload categories if validation fails
+                var categories = await _categoryRepository.GetAllAsync();
+                ViewBag.Categories = new SelectList(categories, "Id", "Name", product.CategoryId);
+                return View(product);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Lỗi khi cập nhật sản phẩm: " + ex.Message;
+                var categories = await _categoryRepository.GetAllAsync();
+                ViewBag.Categories = new SelectList(categories, "Id", "Name", product.CategoryId);
+                return View(product);
+            }
         }
 
         public async Task<IActionResult> Delete(int id)
         {
-            var product = await _productRepository.GetByIdAsync(id);
-            if (product == null)
+            try
             {
-                return NotFound();
+                var product = await _productRepository.GetByIdAsync(id);
+                if (product == null)
+                {
+                    TempData["ErrorMessage"] = "Không tìm thấy sản phẩm!";
+                    return RedirectToAction(nameof(Index));
+                }
+                return View(product);
             }
-
-            return View(product);
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Lỗi khi tải trang xóa sản phẩm: " + ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
         }
 
-        [HttpPost, ActionName("DeleteConfirmed")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        [ActionName("DeleteConfirmed")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _productRepository.DeleteAsync(id);
-            TempData["SuccessMessage"] = "Xóa sản phẩm thành công!";
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                var product = await _productRepository.GetByIdAsync(id);
+                if (product == null)
+                {
+                    TempData["ErrorMessage"] = "Không tìm thấy sản phẩm!";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                await _productRepository.DeleteAsync(id);
+                TempData["SuccessMessage"] = "Xóa sản phẩm thành công!";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = "Lỗi khi xóa sản phẩm: " + ex.Message;
+                return RedirectToAction(nameof(Index));
+            }
         }
 
         private async Task<string> SaveImage(IFormFile image)
         {
-            var imagesFolder = Path.Combine("wwwroot", "images");
-            if (!Directory.Exists(imagesFolder))
+            try
             {
-                Directory.CreateDirectory(imagesFolder);
-            }
+                // Create images directory if it doesn't exist
+                var imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
+                if (!Directory.Exists(imagesFolder))
+                {
+                    Directory.CreateDirectory(imagesFolder);
+                }
 
-            var savePath = Path.Combine(imagesFolder, image.FileName);
-            using (var fileStream = new FileStream(savePath, FileMode.Create))
+                // Generate unique filename
+                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+                var filePath = Path.Combine(imagesFolder, fileName);
+
+                // Save file
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await image.CopyToAsync(fileStream);
+                }
+
+                return "/images/" + fileName;
+            }
+            catch (Exception ex)
             {
-                await image.CopyToAsync(fileStream);
+                throw new Exception("Lỗi khi lưu hình ảnh: " + ex.Message);
             }
-
-            return "/images/" + image.FileName;
         }
     }
 }
