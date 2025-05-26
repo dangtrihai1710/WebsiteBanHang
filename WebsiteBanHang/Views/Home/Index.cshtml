@@ -3,51 +3,134 @@
     ViewData["Title"] = "Trang chủ";
 }
 
-<!-- Hero Section -->
-<section class="bg-primary text-white py-5 rounded-3 mb-4">
-    <div class="container px-4 px-lg-5 my-3">
-        <div class="text-center">
-            <h1 class="display-4 fw-bolder">Chào mừng đến với cửa hàng của chúng tôi</h1>
-            <p class="lead fw-normal text-white-50 mb-0">Khám phá các sản phẩm chất lượng cao với giá cả hợp lý</p>
+<!-- Hero Section với Animation -->
+<section class="hero-section position-relative overflow-hidden">
+    <div class="hero-bg"></div>
+    <div class="container position-relative">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-6">
+                <div class="hero-content">
+                    <h1 class="hero-title mb-4 animate-fade-in">
+                        Khám phá thế giới 
+                        <span class="text-gradient">công nghệ</span> 
+                        cùng chúng tôi
+                    </h1>
+                    <p class="hero-subtitle mb-4 animate-fade-in-delay">
+                        Những sản phẩm công nghệ hàng đầu với chất lượng tuyệt vời 
+                        và giá cả cạnh tranh nhất thị trường.
+                    </p>
+                    <div class="hero-buttons animate-fade-in-delay-2">
+                        <a href="#products" class="btn btn-primary btn-lg me-3 btn-modern">
+                            <i class="bi bi-arrow-right me-2"></i>Khám phá ngay
+                        </a>
+                        <a href="#about" class="btn btn-outline-light btn-lg btn-modern">
+                            <i class="bi bi-play-circle me-2"></i>Xem video
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="hero-image animate-float">
+                    <img src="/images/hero-tech.svg" alt="Hero Image" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Floating Elements -->
+    <div class="floating-elements">
+        <div class="floating-element floating-1"></div>
+        <div class="floating-element floating-2"></div>
+        <div class="floating-element floating-3"></div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section py-5 bg-light">
+    <div class="container">
+        <div class="row g-4 text-center">
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="bi bi-people text-primary"></i>
+                    </div>
+                    <div class="stat-number">10,000+</div>
+                    <div class="stat-label">Khách hàng hài lòng</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="bi bi-box-seam text-success"></i>
+                    </div>
+                    <div class="stat-number">5,000+</div>
+                    <div class="stat-label">Sản phẩm chất lượng</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="bi bi-truck text-warning"></i>
+                    </div>
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Giao hàng nhanh chóng</div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-6">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="bi bi-award text-danger"></i>
+                    </div>
+                    <div class="stat-number">99%</div>
+                    <div class="stat-label">Đánh giá tích cực</div>
+                </div>
+            </div>
         </div>
     </div>
 </section>
 
-<!-- Categories Section -->
-<section class="mb-5">
+<!-- Features Section -->
+<section class="features-section py-5">
     <div class="container">
-        <div class="row g-3">
-            <div class="col-md-4">
-                <div class="card bg-light text-dark h-100 border-0 shadow-sm">
-                    <div class="card-body text-center p-4 p-lg-5">
-                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4 p-2 d-inline-block">
-                            <i class="bi bi-collection fs-2"></i>
-                        </div>
-                        <h2 class="fs-4 fw-bold">Sản phẩm mới</h2>
-                        <p class="mb-0">Khám phá những sản phẩm mới nhất của chúng tôi!</p>
+        <div class="section-header text-center mb-5">
+            <h2 class="section-title">Tại sao chọn chúng tôi?</h2>
+            <p class="section-subtitle">Những ưu điểm vượt trội của ShopPro</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card modern-card h-100">
+                    <div class="feature-icon gradient-primary">
+                        <i class="bi bi-shield-check"></i>
                     </div>
+                    <h4 class="feature-title">Chất lượng đảm bảo</h4>
+                    <p class="feature-desc">
+                        Tất cả sản phẩm đều được kiểm tra kỹ lưỡng và có chế độ bảo hành toàn diện.
+                    </p>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card bg-light text-dark h-100 border-0 shadow-sm">
-                    <div class="card-body text-center p-4 p-lg-5">
-                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4 p-2 d-inline-block">
-                            <i class="bi bi-gift fs-2"></i>
-                        </div>
-                        <h2 class="fs-4 fw-bold">Khuyến mãi đặc biệt</h2>
-                        <p class="mb-0">Ưu đãi hấp dẫn dành cho khách hàng thân thiết!</p>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card modern-card h-100">
+                    <div class="feature-icon gradient-success">
+                        <i class="bi bi-lightning-charge"></i>
                     </div>
+                    <h4 class="feature-title">Giao hàng siêu tốc</h4>
+                    <p class="feature-desc">
+                        Giao hàng trong vòng 2-4 giờ tại nội thành và 1-2 ngày toàn quốc.
+                    </p>
                 </div>
             </div>
-            <div class="col-md-4">
-                <div class="card bg-light text-dark h-100 border-0 shadow-sm">
-                    <div class="card-body text-center p-4 p-lg-5">
-                        <div class="feature bg-primary bg-gradient text-white rounded-3 mb-4 mt-n4 p-2 d-inline-block">
-                            <i class="bi bi-truck fs-2"></i>
-                        </div>
-                        <h2 class="fs-4 fw-bold">Giao hàng nhanh</h2>
-                        <p class="mb-0">Giao hàng tận nơi, nhanh chóng và an toàn!</p>
+            
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card modern-card h-100">
+                    <div class="feature-icon gradient-warning">
+                        <i class="bi bi-headset"></i>
                     </div>
+                    <h4 class="feature-title">Hỗ trợ 24/7</h4>
+                    <p class="feature-desc">
+                        Đội ngũ chăm sóc khách hàng chuyên nghiệp, sẵn sàng hỗ trợ mọi lúc.
+                    </p>
                 </div>
             </div>
         </div>
@@ -55,66 +138,131 @@
 </section>
 
 <!-- Products Section -->
-<section class="py-2">
-    <div class="container px-4 px-lg-5 mt-5">
-        <h2 class="fw-bold mb-4 position-relative pb-2">
-            Sản phẩm nổi bật
-            <span class="position-absolute start-0 bottom-0" style="width: 50px; height: 2px; background-color: #0d6efd;"></span>
-        </h2>
+<section id="products" class="products-section py-5 bg-light">
+    <div class="container">
+        <div class="section-header text-center mb-5">
+            <h2 class="section-title">Sản phẩm nổi bật</h2>
+            <p class="section-subtitle">Khám phá những sản phẩm hot nhất hiện nay</p>
+        </div>
 
-        <div class="row gx-4 gx-lg-5 row-cols-1 row-cols-md-3 row-cols-xl-4 justify-content-center">
-            @foreach (var item in Model)
-            {
-                <div class="col mb-5">
-                    <div class="card h-100 border-0 shadow-sm">
-                        <!-- Sale badge-->
-                        <div class="badge bg-danger text-white position-absolute" style="top: 0.5rem; right: 0.5rem">Giảm giá</div>
-                        <!-- Product image-->
-                        <img class="card-img-top" src="@item.ImageUrl" alt="@item.Name" style="height: 250px; object-fit: cover;">
-                        <!-- Product details-->
-                        <div class="card-body p-4">
-                            <div class="text-center">
-                                <!-- Product name-->
-                                <h5 class="fw-bolder">@Html.DisplayFor(modelItem => item.Name)</h5>
-                                <!-- Product category -->
-                                <div class="d-flex justify-content-center small text-muted mb-2">
-                                    <div class="text-primary">@item.Category?.Name</div>
-                                </div>
-                                <!-- Product price-->
-                                <span class="fw-bold text-danger fs-5">@item.Price.ToString("#,##0") VNĐ</span>
+        @if (Model != null && Model.Any())
+        {
+            <div class="row g-4">
+                @foreach (var item in Model.Take(8))
+                {
+                    <div class="col-xl-3 col-lg-4 col-md-6">
+                        <div class="product-card modern-card h-100">
+                            <!-- Product Badges -->
+                            <div class="product-badges">
+                                <span class="badge bg-danger">Hot</span>
+                                <span class="badge bg-success">-20%</span>
                             </div>
-                        </div>
-                        <!-- Product actions-->
-                        <div class="card-footer p-4 pt-0 border-top-0 bg-transparent">
-                            <div class="d-flex justify-content-between">
-                                <a href="@Url.Action("Display", "Product", new { id = item.Id })" class="btn btn-outline-primary">
-                                    <i class="bi bi-eye"></i> Chi tiết
-                                </a>
-                                <a href="#" class="btn btn-primary">
-                                    <i class="bi bi-cart-plus"></i> Thêm vào giỏ
-                                </a>
+                            
+                            <!-- Product Image -->
+                            <div class="product-image-container">
+                                <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "/images/placeholder.jpg" : item.ImageUrl)" 
+                                     class="product-image" alt="@item.Name">
+                                <div class="product-overlay">
+                                    <div class="product-actions">
+                                        <a href="@Url.Action("Display", "Product", new { id = item.Id })" 
+                                           class="btn btn-primary btn-sm">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <button class="btn btn-success btn-sm">
+                                            <i class="bi bi-cart-plus"></i>
+                                        </button>
+                                        <button class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-heart"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Product Info -->
+                            <div class="product-info">
+                                <div class="product-category">@(item.Category?.Name ?? "Chưa phân loại")</div>
+                                <h5 class="product-title">@item.Name</h5>
+                                <div class="product-rating mb-2">
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star-fill text-warning"></i>
+                                    <i class="bi bi-star text-muted"></i>
+                                    <span class="rating-text">(4.0)</span>
+                                </div>
+                                <div class="product-price">
+                                    <span class="price-current">@item.Price.ToString("#,##0") VNĐ</span>
+                                    <span class="price-old">@((item.Price * 1.2m).ToString("#,##0")) VNĐ</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Product Footer -->
+                            <div class="product-footer">
+                                <button class="btn btn-primary btn-add-cart w-100">
+                                    <i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ
+                                </button>
                             </div>
                         </div>
                     </div>
-                </div>
-            }
-        </div>
+                }
+            </div>
+            
+            <div class="text-center mt-5">
+                <a href="@Url.Action("Index", "Product")" class="btn btn-outline-primary btn-lg">
+                    Xem tất cả sản phẩm <i class="bi bi-arrow-right ms-2"></i>
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="text-center">
+                <img src="/images/empty-products.svg" alt="No products" class="img-fluid mb-4" style="max-width: 300px;">
+                <h4>Chưa có sản phẩm nào</h4>
+                <p class="text-muted">Hãy quay lại sau để khám phá những sản phẩm tuyệt vời!</p>
+            </div>
+        }
     </div>
 </section>
 
-<!-- Newsletter -->
-<section class="py-5 bg-light rounded-3">
-    <div class="container px-4 px-lg-5">
-        <div class="row gx-4 gx-lg-5 justify-content-center">
-            <div class="col-md-10 col-lg-8 col-xl-7">
-                <div class="text-center">
-                    <h2 class="fw-bold mb-3">Đăng ký nhận thông tin</h2>
-                    <p class="text-muted mb-4">Để nhận thông tin khuyến mãi và sản phẩm mới nhất từ chúng tôi!</p>
-                    <div class="input-group mb-3 shadow-sm">
-                        <input class="form-control" type="email" placeholder="Nhập email của bạn..." aria-label="Nhập email của bạn..." aria-describedby="button-newsletter" />
-                        <button class="btn btn-primary" id="button-newsletter" type="button">Đăng ký</button>
+<!-- Newsletter Section -->
+<section class="newsletter-section py-5 bg-primary text-white position-relative">
+    <div class="newsletter-bg"></div>
+    <div class="container position-relative">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 text-center">
+                <h2 class="newsletter-title mb-3">Đăng ký nhận thông tin mới nhất</h2>
+                <p class="newsletter-subtitle mb-4">
+                    Nhận thông báo về sản phẩm mới, khuyến mãi đặc biệt và những ưu đãi hấp dẫn
+                </p>
+                
+                <div class="newsletter-form">
+                    <div class="input-group input-group-lg">
+                        <input type="email" class="form-control newsletter-input" 
+                               placeholder="Nhập địa chỉ email của bạn...">
+                        <button class="btn btn-light newsletter-btn" type="button">
+                            <i class="bi bi-send me-2"></i>Đăng ký ngay
+                        </button>
                     </div>
-                    <div class="small text-muted">Chúng tôi sẽ không bao giờ chia sẻ thông tin của bạn cho bên thứ ba.</div>
+                </div>
+                
+                <div class="newsletter-features mt-4">
+                    <div class="row g-3 justify-content-center">
+                        <div class="col-auto">
+                            <span class="feature-badge">
+                                <i class="bi bi-check-circle me-1"></i>Miễn phí
+                            </span>
+                        </div>
+                        <div class="col-auto">
+                            <span class="feature-badge">
+                                <i class="bi bi-shield-check me-1"></i>Bảo mật
+                            </span>
+                        </div>
+                        <div class="col-auto">
+                            <span class="feature-badge">
+                                <i class="bi bi-x-circle me-1"></i>Không spam
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

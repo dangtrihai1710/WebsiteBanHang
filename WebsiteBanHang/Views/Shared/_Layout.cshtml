@@ -5,41 +5,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Website Bán Hàng</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/WebsiteBanHang.styles.css" asp-append-version="true" />
 </head>
 <body>
     <div class="d-flex flex-column min-vh-100">
-        <header>
-            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-                <div class="container-fluid">
-                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Website Bán Hàng</a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                            aria-expanded="false" aria-label="Toggle navigation">
+        <!-- Enhanced Header -->
+        <header class="header-modern shadow-sm">
+            <nav class="navbar navbar-expand-lg navbar-light bg-white py-3">
+                <div class="container">
+                    <a class="navbar-brand brand-modern" asp-area="" asp-controller="Home" asp-action="Index">
+                        <i class="bi bi-shop text-primary me-2"></i>
+                        <span class="fw-bold">ShopPro</span>
+                    </a>
+
+                    <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                         <span class="navbar-toggler-icon"></span>
                     </button>
-                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                        <ul class="navbar-nav flex-grow-1">
+
+                    <div class="collapse navbar-collapse" id="navbarNav">
+                        <ul class="navbar-nav mx-auto">
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Trang chủ</a>
+                                <a class="nav-link nav-link-modern" asp-area="" asp-controller="Home" asp-action="Index">
+                                    <i class="bi bi-house me-1"></i>Trang chủ
+                                </a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle nav-link-modern" href="#" role="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-grid me-1"></i>Sản phẩm
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-modern">
+                                    <li><a class="dropdown-item" asp-controller="Product" asp-action="Index">Tất cả sản phẩm</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Category" asp-action="Index">Danh mục</a></li>
+                                </ul>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Product" asp-action="Index">Quản lý sản phẩm</a>
+                                <a class="nav-link nav-link-modern" asp-area="" asp-controller="Home" asp-action="Privacy">
+                                    <i class="bi bi-shield-check me-1"></i>Chính sách
+                                </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Chính sách</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Category" asp-action="Index">Quản lý danh mục</a>
+                                <a class="nav-link nav-link-modern" href="#contact">
+                                    <i class="bi bi-telephone me-1"></i>Liên hệ
+                                </a>
                             </li>
                         </ul>
-                        <div class="d-flex">
-                            <button class="btn btn-outline-dark" type="submit">
-                                <i class="bi-cart-fill me-1"></i>
+
+                        <div class="d-flex align-items-center">
+                            <div class="search-box me-3">
+                                <div class="input-group">
+                                    <input type="text" class="form-control search-input" placeholder="Tìm kiếm sản phẩm...">
+                                    <button class="btn btn-outline-secondary search-btn" type="button">
+                                        <i class="bi bi-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <button class="btn btn-primary cart-btn position-relative me-2">
+                                <i class="bi bi-cart3 me-1"></i>
                                 Giỏ hàng
-                                <span class="badge bg-dark text-white ms-1 rounded-pill">0</span>
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    0
+                                </span>
                             </button>
+
+                            <div class="dropdown">
+                                <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-person"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" href="#">Đăng nhập</a></li>
+                                    <li><a class="dropdown-item" href="#">Đăng ký</a></li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -47,14 +87,82 @@
         </header>
 
         <main class="flex-grow-1">
-            <div class="container">
-                @RenderBody()
-            </div>
+            @RenderBody()
         </main>
 
-        <footer class="bg-light text-muted border-top mt-5">
-            <div class="container py-4 text-center">
-                <span class="text-secondary">&copy; 2025 - Website Bán Hàng - <a asp-area="" asp-controller="Home" asp-action="Privacy">Chính sách</a></span>
+        <!-- Enhanced Footer -->
+        <footer class="footer-modern bg-dark text-light">
+            <div class="container py-5">
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <div class="footer-brand mb-4">
+                            <i class="bi bi-shop text-primary me-2 fs-3"></i>
+                            <span class="h4 fw-bold text-white">ShopPro</span>
+                        </div>
+                        <p class="text-light-emphasis mb-4">
+                            Chúng tôi cung cấp những sản phẩm chất lượng cao với giá cả hợp lý,
+                            mang đến trải nghiệm mua sắm tuyệt vời cho khách hàng.
+                        </p>
+                        <div class="social-links">
+                            <a href="#" class="social-link"><i class="bi bi-facebook"></i></a>
+                            <a href="#" class="social-link"><i class="bi bi-twitter"></i></a>
+                            <a href="#" class="social-link"><i class="bi bi-instagram"></i></a>
+                            <a href="#" class="social-link"><i class="bi bi-linkedin"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-2 col-md-6">
+                        <h6 class="footer-title">Sản phẩm</h6>
+                        <ul class="footer-links">
+                            <li><a href="#">Laptop</a></li>
+                            <li><a href="#">Desktop</a></li>
+                            <li><a href="#">Phụ kiện</a></li>
+                            <li><a href="#">Gaming</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-lg-2 col-md-6">
+                        <h6 class="footer-title">Hỗ trợ</h6>
+                        <ul class="footer-links">
+                            <li><a href="#">Trung tâm hỗ trợ</a></li>
+                            <li><a href="#">Chính sách bảo hành</a></li>
+                            <li><a href="#">Hướng dẫn mua hàng</a></li>
+                            <li><a href="#">FAQ</a></li>
+                        </ul>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <h6 class="footer-title">Liên hệ</h6>
+                        <div class="contact-info mb-4">
+                            <div class="contact-item">
+                                <i class="bi bi-geo-alt text-primary me-2"></i>
+                                <span>123 Đường ABC, Quận 1, TP.HCM</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="bi bi-telephone text-primary me-2"></i>
+                                <span>0123 456 789</span>
+                            </div>
+                            <div class="contact-item">
+                                <i class="bi bi-envelope text-primary me-2"></i>
+                                <span>info@shoppro.com</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr class="my-4 border-secondary">
+
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <p class="mb-0 text-light-emphasis">
+                            &copy; 2025 ShopPro. Tất cả quyền được bảo lưu.
+                        </p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <a href="#" class="text-light-emphasis me-3">Chính sách bảo mật</a>
+                        <a href="#" class="text-light-emphasis">Điều khoản sử dụng</a>
+                    </div>
+                </div>
             </div>
         </footer>
     </div>
