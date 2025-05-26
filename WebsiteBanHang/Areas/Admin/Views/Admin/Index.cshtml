@@ -84,7 +84,10 @@
             </div>
             <div class="card-body">
                 <div class="chart-area">
-                    <canvas id="myAreaChart"></canvas>
+                    <div class="text-center p-5">
+                        <i class="bi bi-bar-chart" style="font-size: 4rem; color: #ddd;"></i>
+                        <p class="text-muted mt-3">Biểu đồ thống kê sẽ được hiển thị tại đây</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -97,19 +100,19 @@
             </div>
             <div class="card-body">
                 <div class="d-grid gap-2">
-                    <a asp-area="Admin" asp-controller="Product" asp-action="Add" class="btn btn-primary btn-admin">
+                    <a href="/Admin/Product/Add" class="btn btn-primary btn-admin">
                         <i class="bi bi-plus-circle me-2"></i>
                         Thêm sản phẩm mới
                     </a>
-                    <a asp-area="Admin" asp-controller="Category" asp-action="Add" class="btn btn-success btn-admin">
+                    <a href="/Admin/Category/Add" class="btn btn-success btn-admin">
                         <i class="bi bi-plus-circle me-2"></i>
                         Thêm danh mục mới
                     </a>
-                    <a asp-area="Admin" asp-controller="Product" asp-action="Index" class="btn btn-info btn-admin">
+                    <a href="/Admin/Product/Index" class="btn btn-info btn-admin">
                         <i class="bi bi-list me-2"></i>
                         Xem tất cả sản phẩm
                     </a>
-                    <a asp-area="Admin" asp-controller="Category" asp-action="Index" class="btn btn-warning btn-admin">
+                    <a href="/Admin/Category/Index" class="btn btn-warning btn-admin">
                         <i class="bi bi-list me-2"></i>
                         Xem tất cả danh mục
                     </a>
@@ -151,12 +154,14 @@
 
 @section Scripts {
     <script>
-        // Placeholder for chart
-        document.addEventListener('DOMContentLoaded', function() {
-            const ctx = document.getElementById('myAreaChart');
-            if (ctx) {
-                ctx.innerHTML = '<p class="text-center text-muted">Biểu đồ thống kê sẽ được hiển thị tại đây</p>';
-            }
+        // Test script để kiểm tra JavaScript
+        $(document).ready(function() {
+            console.log('Admin Dashboard loaded successfully!');
+
+            // Test click events
+            $('.btn-admin').click(function(e) {
+                console.log('Button clicked:', $(this).attr('href'));
+            });
         });
     </script>
 }

@@ -31,11 +31,12 @@ app.UseRouting();
 
 app.UseAuthorization();
 
-// Cấu hình routing cho Areas
+// CẤU HÌNH ROUTING CHO ADMIN AREA - QUAN TRỌNG!
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
 
+// Default routing
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");

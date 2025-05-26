@@ -4,7 +4,7 @@ using WebsiteBanHang.Repositories;
 
 namespace WebsiteBanHang.Areas.Admin.Controllers
 {
-    [Area("Admin")]
+    [Area("Admin")] // QUAN TRỌNG: Phải có attribute này
     public class AdminController : Controller
     {
         private readonly IProductRepository _productRepository;
