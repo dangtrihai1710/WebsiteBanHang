@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// QUAN TRỌNG: Cấu hình Identity với ApplicationUser
+// QUAN TRỌNG: Sử dụng ApplicationUser thay vì IdentityUser
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
     options.Password.RequireDigit = false;
     options.Password.RequireLowercase = false;
