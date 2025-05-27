@@ -73,22 +73,7 @@
                             </a>
 
                             <!-- User Dropdown -->
-                            <div class="dropdown">
-                                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-person-circle me-1"></i>
-                                    Tài khoản
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                                    <li><a class="dropdown-item" href="/Identity/Account/Login"><i class="bi bi-person me-2"></i>Đăng nhập</a></li>
-                                    <li><a class="dropdown-item" href="/Identity/Account/Register"><i class="bi bi-person-plus me-2"></i>Đăng ký</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li>
-                                        <a class="dropdown-item" href="/Admin/Admin/Index">
-                                            <i class="bi bi-shield-lock me-2"></i>Admin Panel
-                                        </a>
-                                    </li>
-                                </ul>
-                            </div>
+                            <partial name="_LoginPartial" />
                         </div>
                     </div>
                 </div>

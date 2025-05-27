@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using WebsiteBanHang.Models;
 using WebsiteBanHang.Repositories;
 
@@ -8,8 +9,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Cấu hình Identity
+builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+    .AddDefaultTokenProviders()
+    .AddDefaultUI()
+    .AddEntityFrameworkStores<ApplicationDbContext>();
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
 
 // Đăng ký Repositories
 builder.Services.AddScoped<IProductRepository, EFProductRepository>();
@@ -29,10 +37,12 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
-// CẤU HÌNH ROUTING CHO ADMIN AREA - QUAN TRỌNG!
-// Đảm bảo route area đặt trước route mặc định
+app.MapRazorPages();
+
+// CẤU HÌNH ROUTING CHO ADMIN AREA
 app.MapControllerRoute(
     name: "areas",
     pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
@@ -41,12 +51,5 @@ app.MapControllerRoute(
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
-// Đảm bảo thư mục tồn tại
-var imagesFolder = Path.Combine(app.Environment.WebRootPath, "images");
-if (!Directory.Exists(imagesFolder))
-{
-    Directory.CreateDirectory(imagesFolder);
-}
 
 app.Run();
