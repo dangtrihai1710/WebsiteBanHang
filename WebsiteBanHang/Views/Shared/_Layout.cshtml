@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/modern-style.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/footer-style.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/header-style.css" asp-append-version="true" />
     <style>
         .cart-btn {
             transition: all 0.3s ease;
@@ -100,67 +99,78 @@
     </style>
 </head>
 <body>
-    <!-- HTML cho header responsive - Cập nhật phần header trong _Layout.cshtml -->
-    <header class="header-container">
-        <!-- Mobile menu button -->
-        <button class="mobile-menu-button" id="mobileMenuButton">
-            <i class="bi bi-list" style="font-size: 1.5rem;"></i>
-        </button>
-
-        <!-- Logo -->
-        <a href="/" class="site-logo">
-            <i class="bi bi-shop"></i>
-            ShopPro
-        </a>
-
-        <!-- Navigation container -->
-        <div class="nav-container" id="navContainer">
-            <!-- Main navigation -->
-            <nav class="main-nav">
-                <div class="nav-item">
-                    <a href="/" class="nav-link">
-                        <i class="bi bi-house"></i>Trang chủ
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="/Product" class="nav-link">
-                        <i class="bi bi-grid"></i>Sản phẩm
-                    </a>
-                </div>
-                <div class="nav-item">
-                    <a href="#" class="nav-link" id="categoriesDropdown">
-                        <i class="bi bi-tags"></i>Danh mục
-                        <i class="bi bi-chevron-down ms-1"></i>
-                    </a>
-                    <!-- Dropdown menu for categories -->
-                </div>
-                <div class="nav-item">
-                    <a href="/Contact" class="nav-link">
-                        <i class="bi bi-envelope"></i>Liên hệ
-                    </a>
-                </div>
-            </nav>
-
-            <!-- Search form -->
-            <form action="/Product" method="get" class="search-form">
-                <input type="text" name="searchTerm" class="search-input" placeholder="Tìm kiếm sản phẩm...">
-                <button type="submit" class="search-button">
-                    <i class="bi bi-search"></i>
-                </button>
-            </form>
-        </div>
-
-        <!-- User actions -->
-        <div class="user-actions">
-            <!-- Cart button -->
-            <a href="/ShoppingCart" class="cart-button">
-                <i class="bi bi-cart me-1"></i>
-                Giỏ hàng
-                <span class="cart-badge" id="cartBadge">0</span>
+    <!-- Header -->
+    <header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm sticky-top">
+        <div class="container">
+            <!-- Brand -->
+            <a class="navbar-brand fw-bold text-primary fs-3" asp-area="" asp-controller="Home" asp-action="Index">
+                <i class="bi bi-shop me-2"></i>ShopPro
             </a>
 
-            <!-- User Authentication -->
-            <partial name="_LoginPartial" />
+            <!-- Mobile Toggle Button -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navigation -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Main Navigation -->
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                            <i class="bi bi-house me-1"></i>Trang chủ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" asp-area="" asp-controller="Product" asp-action="Index">
+                            <i class="bi bi-grid me-1"></i>Sản phẩm
+                        </a>
+                    </li>
+
+                    <!-- Danh mục động từ database -->
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-tags me-1"></i>Danh mục
+                        </a>
+                        <ul class="dropdown-menu" id="dynamic-categories">
+                            <!-- Categories sẽ được load bằng JavaScript -->
+                        </ul>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">
+                            <i class="bi bi-envelope me-1"></i>Liên hệ
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Search Bar -->
+                <form class="d-flex me-3" asp-controller="Product" asp-action="Index" method="get">
+                    <div class="input-group">
+                        <input class="form-control search-input" type="search" name="searchTerm"
+                               placeholder="Tìm kiếm sản phẩm..." aria-label="Search" value="@ViewBag.SearchTerm">
+                        <button class="btn btn-outline-primary search-btn" type="submit">
+                            <i class="bi bi-search"></i>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Right Side Navigation -->
+                <div class="d-flex align-items-center">
+                    <!-- Cart Button -->
+                    <a asp-controller="ShoppingCart" asp-action="Index"
+                       class="btn btn-outline-dark me-3 cart-btn position-relative"
+                       title="Giỏ hàng">
+                        <i class="bi-cart-fill me-1"></i>
+                        Giỏ hàng
+                        <span class="badge bg-danger text-white ms-1 rounded-pill position-absolute top-0 start-100 translate-middle d-none"
+                              id="cart-badge">0</span>
+                    </a>
+
+                    <!-- User Authentication -->
+                    <partial name="_LoginPartial" />
+                </div>
+            </div>
         </div>
     </header>
 
