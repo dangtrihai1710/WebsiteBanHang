@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 using WebsiteBanHang.Models;
+using WebsiteBanHang.Extensions;
 
 namespace WebsiteBanHang.Areas.Identity.Pages.Account
 {
@@ -68,10 +69,19 @@ namespace WebsiteBanHang.Areas.Identity.Pages.Account
 
             if (ModelState.IsValid)
             {
+                // Lưu giỏ hàng guest trước khi đăng nhập
+                var guestCartKey = $"Cart_{HttpContext.Session.Id}";
+                var guestCart = HttpContext.Session.GetObjectFromJson<ShoppingCart>(guestCartKey);
+
                 var result = await _signInManager.PasswordSignInAsync(Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
+
                 if (result.Succeeded)
                 {
                     _logger.LogInformation("User logged in.");
+
+                    // Merge giỏ hàng sau khi đăng nhập thành công
+                    await MergeGuestCartToUserCart(guestCart);
+
                     return LocalRedirect(returnUrl);
                 }
                 if (result.IsLockedOut)
@@ -87,6 +97,43 @@ namespace WebsiteBanHang.Areas.Identity.Pages.Account
             }
 
             return Page();
+        }
+
+        private async Task MergeGuestCartToUserCart(ShoppingCart? guestCart)
+        {
+            try
+            {
+                if (guestCart != null && guestCart.Items.Any())
+                {
+                    // Lấy thông tin user hiện tại
+                    var user = await _signInManager.UserManager.GetUserAsync(HttpContext.User);
+                    if (user != null)
+                    {
+                        var userCartKey = $"Cart_{user.Id}";
+                        var userCart = HttpContext.Session.GetObjectFromJson<ShoppingCart>(userCartKey)
+                                      ?? new ShoppingCart();
+
+                        // Merge giỏ hàng guest vào giỏ hàng user
+                        foreach (var item in guestCart.Items)
+                        {
+                            userCart.AddItem(item);
+                        }
+
+                        // Lưu giỏ hàng đã merge
+                        HttpContext.Session.SetObjectAsJson(userCartKey, userCart);
+
+                        // Xóa giỏ hàng guest
+                        var guestCartKey = $"Cart_{HttpContext.Session.Id}";
+                        HttpContext.Session.Remove(guestCartKey);
+
+                        _logger.LogInformation($"Merged guest cart with {guestCart.Items.Count} items to user cart.");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error merging guest cart to user cart.");
+            }
         }
     }
 }

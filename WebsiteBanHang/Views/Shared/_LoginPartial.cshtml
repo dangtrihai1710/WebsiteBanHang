@@ -40,6 +40,11 @@
                     </a>
                 </li>
                 <li>
+                    <a class="dropdown-item" asp-controller="ShoppingCart" asp-action="Index">
+                        <i class="bi bi-cart me-2"></i>Giỏ hàng của tôi
+                    </a>
+                </li>
+                <li>
                     <a class="dropdown-item" href="#">
                         <i class="bi bi-heart me-2"></i>Sản phẩm yêu thích
                     </a>
@@ -63,9 +68,53 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login" id="login-link">
                 <i class="bi bi-person me-1"></i>Đăng nhập
             </a>
         </li>
     }
 </ul>
+
+@if (SignInManager.IsSignedIn(User))
+{
+    <!-- Script để merge giỏ hàng khi user vừa đăng nhập -->
+    <script>
+        $(document).ready(function() {
+            // Kiểm tra xem có cần merge giỏ hàng không
+            if (sessionStorage.getItem('needMergeCart') === 'true') {
+                // Gọi API merge giỏ hàng
+                $.post('@Url.Action("MergeCartOnLogin", "ShoppingCart")')
+                    .done(function(response) {
+                        if (response.success) {
+                            // Cập nhật lại số lượng giỏ hàng
+                            if (typeof updateCartBadge === 'function') {
+                                updateCartBadge();
+                            }
+                        }
+                    })
+                    .always(function() {
+                        // Xóa flag
+                        sessionStorage.removeItem('needMergeCart');
+                    });
+            }
+        });
+    </script>
+}
+else
+{
+    <!-- Script để đánh dấu cần merge giỏ hàng khi đăng nhập -->
+    <script>
+        $(document).ready(function() {
+            $('#login-link').click(function() {
+                // Kiểm tra xem có sản phẩm trong giỏ hàng không
+                $.get('@Url.Action("GetCartCount", "ShoppingCart")')
+                    .done(function(data) {
+                        if (data.count > 0) {
+                            // Đánh dấu cần merge giỏ hàng sau khi đăng nhập
+                            sessionStorage.setItem('needMergeCart', 'true');
+                        }
+                    });
+            });
+        });
+    </script>
+}

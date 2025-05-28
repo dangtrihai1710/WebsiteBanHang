@@ -1,5 +1,5 @@
-﻿// Controllers/ShoppingCartController.cs
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
 using WebsiteBanHang.Models;
 using WebsiteBanHang.Repositories;
 using WebsiteBanHang.Extensions;
@@ -9,11 +9,15 @@ namespace WebsiteBanHang.Controllers
     public class ShoppingCartController : Controller
     {
         private readonly IProductRepository _productRepository;
+        private readonly UserManager<ApplicationUser> _userManager;
         private const string CartSessionKey = "Cart";
 
-        public ShoppingCartController(IProductRepository productRepository)
+        public ShoppingCartController(
+            IProductRepository productRepository,
+            UserManager<ApplicationUser> userManager)
         {
             _productRepository = productRepository;
+            _userManager = userManager;
         }
 
         // Hiển thị giỏ hàng
@@ -100,7 +104,8 @@ namespace WebsiteBanHang.Controllers
         // Xóa toàn bộ giỏ hàng
         public IActionResult ClearCart()
         {
-            HttpContext.Session.Remove(CartSessionKey);
+            var cartKey = GetCartSessionKey();
+            HttpContext.Session.Remove(cartKey);
             TempData["SuccessMessage"] = "Đã xóa toàn bộ giỏ hàng!";
             return RedirectToAction("Index");
         }
@@ -126,17 +131,80 @@ namespace WebsiteBanHang.Controllers
             return View(cart);
         }
 
+        // Phương thức hỗ trợ: Tạo key giỏ hàng duy nhất cho từng user
+        private string GetCartSessionKey()
+        {
+            if (User.Identity.IsAuthenticated)
+            {
+                // Nếu đã đăng nhập, sử dụng UserId
+                var userId = _userManager.GetUserId(User);
+                return $"{CartSessionKey}_{userId}";
+            }
+            else
+            {
+                // Nếu chưa đăng nhập, sử dụng SessionId
+                var sessionId = HttpContext.Session.Id;
+                return $"{CartSessionKey}_{sessionId}";
+            }
+        }
+
         // Phương thức hỗ trợ: Lấy giỏ hàng từ Session
         private ShoppingCart GetCartFromSession()
         {
-            return HttpContext.Session.GetObjectFromJson<ShoppingCart>(CartSessionKey)
+            var cartKey = GetCartSessionKey();
+            return HttpContext.Session.GetObjectFromJson<ShoppingCart>(cartKey)
                    ?? new ShoppingCart();
         }
 
         // Phương thức hỗ trợ: Lưu giỏ hàng vào Session
         private void SaveCartToSession(ShoppingCart cart)
         {
-            HttpContext.Session.SetObjectAsJson(CartSessionKey, cart);
+            var cartKey = GetCartSessionKey();
+            HttpContext.Session.SetObjectAsJson(cartKey, cart);
+        }
+
+        // Phương thức chuyển giỏ hàng khi user đăng nhập
+        public async Task<IActionResult> MergeCartOnLogin()
+        {
+            try
+            {
+                if (User.Identity.IsAuthenticated)
+                {
+                    var sessionId = HttpContext.Session.Id;
+                    var userId = _userManager.GetUserId(User);
+
+                    var guestCartKey = $"{CartSessionKey}_{sessionId}";
+                    var userCartKey = $"{CartSessionKey}_{userId}";
+
+                    // Lấy giỏ hàng của guest
+                    var guestCart = HttpContext.Session.GetObjectFromJson<ShoppingCart>(guestCartKey);
+
+                    if (guestCart != null && guestCart.Items.Any())
+                    {
+                        // Lấy giỏ hàng của user (nếu có)
+                        var userCart = HttpContext.Session.GetObjectFromJson<ShoppingCart>(userCartKey)
+                                      ?? new ShoppingCart();
+
+                        // Merge giỏ hàng guest vào giỏ hàng user
+                        foreach (var item in guestCart.Items)
+                        {
+                            userCart.AddItem(item);
+                        }
+
+                        // Lưu giỏ hàng đã merge
+                        HttpContext.Session.SetObjectAsJson(userCartKey, userCart);
+
+                        // Xóa giỏ hàng guest
+                        HttpContext.Session.Remove(guestCartKey);
+                    }
+                }
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
         }
     }
 }
