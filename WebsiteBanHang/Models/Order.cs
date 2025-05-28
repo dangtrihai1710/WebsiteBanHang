@@ -1,5 +1,4 @@
-﻿// Models/Order.cs
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
@@ -26,7 +25,7 @@ namespace WebsiteBanHang.Models
         [StringLength(1000, ErrorMessage = "Ghi chú không được quá 1000 ký tự")]
         public string? Notes { get; set; }
 
-        public string OrderStatus { get; set; } = "Đang xử lý";
+        public OrderStatus OrderStatus { get; set; } = OrderStatus.DangXuLy;
 
         [Required]
         [StringLength(100)]
@@ -49,4 +48,3 @@ namespace WebsiteBanHang.Models
         public int TotalItems => OrderDetails?.Sum(od => od.Quantity) ?? 0;
     }
 }
-
