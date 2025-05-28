@@ -1,4 +1,4 @@
-﻿@model WebsiteBanHang.Controllers.ShoppingCartController.CheckoutViewModel
+﻿@model WebsiteBanHang.ViewModels.CheckoutViewModel
 @{
     ViewData["Title"] = "Thanh toán";
 }
@@ -7,6 +7,7 @@
     <h2 class="mb-4"><i class="bi bi-credit-card me-2"></i>Thanh toán</h2>
 
     <form asp-action="PlaceOrder" method="post">
+        @Html.AntiForgeryToken()
         <div class="row">
             <div class="col-lg-8">
                 <!-- Thông tin giao hàng -->
@@ -15,25 +16,22 @@
                         <h5 class="mb-0"><i class="bi bi-truck me-2"></i>Thông tin giao hàng</h5>
                     </div>
                     <div class="card-body">
-                        <div class="row">
-                        </div>
                         <div class="mb-3">
-                            <label asp-for="Order.ShippingAddress" class="form-label">
+                            <label asp-for="ShippingAddress" class="form-label">
                                 Địa chỉ giao hàng <span class="text-danger">*</span>
                             </label>
-                            <textarea asp-for="Order.ShippingAddress" class="form-control" rows="3"
+                            <textarea asp-for="ShippingAddress" class="form-control" rows="3"
                                       placeholder="Nhập địa chỉ chi tiết..." required></textarea>
-                            <span asp-validation-for="Order.ShippingAddress" class="text-danger"></span>
+                            <span asp-validation-for="ShippingAddress" class="text-danger"></span>
                         </div>
                         <div class="mb-3">
-                            <label asp-for="Order.Notes" class="form-label">Ghi chú đơn hàng</label>
-                            <textarea asp-for="Order.Notes" class="form-control" rows="2"
+                            <label asp-for="Notes" class="form-label">Ghi chú đơn hàng</label>
+                            <textarea asp-for="Notes" class="form-control" rows="2"
                                       placeholder="Ghi chú đặc biệt cho đơn hàng (tùy chọn)..."></textarea>
-                            <span asp-validation-for="Order.Notes" class="text-danger"></span>
+                            <span asp-validation-for="Notes" class="text-danger"></span>
                         </div>
                     </div>
                 </div>
-
             </div>
 
             <div class="col-lg-4">
@@ -143,30 +141,13 @@
     }
     <script>
         $(document).ready(function() {
-            // Format phone number input
-            $('#Order_CustomerPhone').on('input', function() {
-                let value = $(this).val().replace(/\D/g, '');
-                if (value.length > 10) {
-                    value = value.substring(0, 10);
-                }
-                $(this).val(value);
-            });
-
             // Form validation
             $('form').on('submit', function(e) {
-                const name = $('#Order_CustomerName').val().trim();
-                const phone = $('#Order_CustomerPhone').val().trim();
-                const address = $('#Order_ShippingAddress').val().trim();
+                const address = $('#ShippingAddress').val().trim();
 
-                if (!name || !phone || !address) {
+                if (!address) {
                     e.preventDefault();
-                    alert('Vui lòng điền đầy đủ thông tin bắt buộc!');
-                    return false;
-                }
-
-                if (phone.length < 10) {
-                    e.preventDefault();
-                    alert('Số điện thoại phải có ít nhất 10 số!');
+                    alert('Vui lòng điền địa chỉ giao hàng!');
                     return false;
                 }
 
@@ -181,8 +162,8 @@
             {
                     <text>
                     // Set default values from user profile if available
-                    if (!$('#Order_CustomerName').val()) {
-                        $('#Order_CustomerName').val('@(ViewBag.UserFullName ?? "")');
+                    if (!$('#ShippingAddress').val()) {
+                        $('#ShippingAddress').val('@(ViewBag.UserAddress ?? "")');
                     }
                     </text>
             }

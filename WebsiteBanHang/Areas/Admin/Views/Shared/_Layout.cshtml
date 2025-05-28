@@ -94,15 +94,15 @@
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="alert('Chức năng đang phát triển')">
-                                <i class="bi bi-people"></i>
-                                Quản lý người dùng
+                            <a class="nav-link" asp-area="Admin" asp-controller="Order" asp-action="Index">
+                                <i class="bi bi-cart-check"></i>
+                                Quản lý đơn hàng
                             </a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#" onclick="alert('Chức năng đang phát triển')">
-                                <i class="bi bi-cart"></i>
-                                Quản lý đơn hàng
+                                <i class="bi bi-people"></i>
+                                Quản lý người dùng
                             </a>
                         </li>
                         <hr class="text-white-50">
@@ -187,6 +187,6 @@
         });
     </script>
 
-    @await RenderSectionAsync("Scripts", required: false)
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

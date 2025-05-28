@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using WebsiteBanHang.Models;
 using WebsiteBanHang.Repositories;
 using WebsiteBanHang.Extensions;
+using WebsiteBanHang.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 
 namespace WebsiteBanHang.Controllers
@@ -135,8 +136,7 @@ namespace WebsiteBanHang.Controllers
 
             var model = new CheckoutViewModel
             {
-                Cart = cart,
-                Order = new Order()
+                Cart = cart
             };
 
             // Nếu user đã đăng nhập, tự động điền thông tin
@@ -145,7 +145,7 @@ namespace WebsiteBanHang.Controllers
                 var user = _userManager.GetUserAsync(User).Result;
                 if (user != null)
                 {
-                    model.Order.ShippingAddress = user.Address ?? "";
+                    model.ShippingAddress = user.Address ?? "";
                     ViewBag.UserFullName = user.FullName;
                 }
             }
@@ -187,8 +187,8 @@ namespace WebsiteBanHang.Controllers
                         UserId = user.Id,
                         OrderDate = DateTime.Now,
                         TotalPrice = cart.GetTotalPrice(),
-                        ShippingAddress = model.Order.ShippingAddress,
-                        Notes = model.Order.Notes,
+                        ShippingAddress = model.ShippingAddress,
+                        Notes = model.Notes
                     };
 
                     // Tạo chi tiết đơn hàng
@@ -386,13 +386,6 @@ namespace WebsiteBanHang.Controllers
         {
             var cartKey = GetCartSessionKey();
             HttpContext.Session.Remove(cartKey);
-        }
-
-        // ViewModel cho trang checkout
-        public class CheckoutViewModel
-        {
-            public ShoppingCart Cart { get; set; } = new ShoppingCart();
-            public Order Order { get; set; } = new Order();
         }
     }
 }
