@@ -1,0 +1,271 @@
+﻿<!-- Areas/Admin/Views/Order/Index.cshtml -->
+@model IEnumerable<WebsiteBanHang.Models.Order>
+@{
+    ViewData["Title"] = "Quản lý đơn hàng";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-cart-check me-2"></i>Quản lý đơn hàng</h2>
+    <div>
+        <button class="btn btn-info" onclick="loadOrderStats()">
+            <i class="bi bi-graph-up me-2"></i>Thống kê
+        </button>
+    </div>
+</div>
+
+<!-- Stats Cards -->
+<div class="row mb-4" id="statsCards" style="display: none;">
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card card-admin bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">Tổng đơn hàng</h6>
+                        <h2 class="mb-0" id="totalOrders">0</h2>
+                    </div>
+                    <i class="bi bi-cart-check" style="font-size: 2rem; opacity: 0.7;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card card-admin bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">Doanh thu</h6>
+                        <h2 class="mb-0" id="totalRevenue">0 VNĐ</h2>
+                    </div>
+                    <i class="bi bi-currency-dollar" style="font-size: 2rem; opacity: 0.7;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card card-admin bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">Đang xử lý</h6>
+                        <h2 class="mb-0">@Model.Count(o => o.OrderStatus == "Đang xử lý")</h2>
+                    </div>
+                    <i class="bi bi-clock" style="font-size: 2rem; opacity: 0.7;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-3 col-md-6 mb-3">
+        <div class="card card-admin bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">Hoàn thành</h6>
+                        <h2 class="mb-0">@Model.Count(o => o.OrderStatus == "Hoàn thành")</h2>
+                    </div>
+                    <i class="bi bi-check-circle" style="font-size: 2rem; opacity: 0.7;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card card-admin">
+    <div class="card-header">
+        <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0"><i class="bi bi-list me-2"></i>Danh sách đơn hàng</h5>
+            <div class="btn-group" role="group">
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="filterOrders('all')">Tất cả</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="filterOrders('Đang xử lý')">Đang xử lý</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="filterOrders('Đang giao')">Đang giao</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="filterOrders('Hoàn thành')">Hoàn thành</button>
+                <button type="button" class="btn btn-outline-secondary btn-sm" onclick="filterOrders('Đã hủy')">Đã hủy</button>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        @if (Model.Any())
+        {
+            <div class="table-responsive">
+                <table class="table table-hover" id="orderTable">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Mã đơn hàng</th>
+                            <th>Khách hàng</th>
+                            <th>Ngày đặt</th>
+                            <th>Tổng tiền</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in Model)
+                        {
+                            <tr data-status="@order.OrderStatus">
+                                <td>
+                                    <span class="badge bg-secondary">#@order.Id</span>
+                                </td>
+                                <td>
+                                    <div>
+                                        <strong>@order.CustomerName</strong>
+                                        <br>
+                                        <small class="text-muted">@order.CustomerPhone</small>
+                                        <br>
+                                        <small class="text-muted">@order.ApplicationUser?.Email</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div>
+                                        @order.OrderDate.ToString("dd/MM/yyyy")
+                                        <br>
+                                        <small class="text-muted">@order.OrderDate.ToString("HH:mm")</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-success fs-6">@order.TotalPrice.ToString("#,##0") VNĐ</span>
+                                    <br>
+                                    <small class="text-muted">@order.TotalItems sản phẩm</small>
+                                </td>
+                                <td>
+                                    <select class="form-select form-select-sm status-select" data-order-id="@order.Id">
+                                        <option value="Đang xử lý" @(order.OrderStatus == "Đang xử lý" ? "selected" : "")>Đang xử lý</option>
+                                        <option value="Đã xác nhận" @(order.OrderStatus == "Đã xác nhận" ? "selected" : "")>Đã xác nhận</option>
+                                        <option value="Đang giao" @(order.OrderStatus == "Đang giao" ? "selected" : "")>Đang giao</option>
+                                        <option value="Hoàn thành" @(order.OrderStatus == "Hoàn thành" ? "selected" : "")>Hoàn thành</option>
+                                        <option value="Đã hủy" @(order.OrderStatus == "Đã hủy" ? "selected" : "")>Đã hủy</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a asp-action="Details" asp-route-id="@order.Id" class="btn btn-info btn-sm" title="Xem chi tiết">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a asp-action="Delete" asp-route-id="@order.Id" class="btn btn-danger btn-sm" title="Xóa">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+                <i class="bi bi-cart-x" style="font-size: 4rem; color: #ddd;"></i>
+                <h4 class="mt-3">Chưa có đơn hàng nào</h4>
+                <p class="text-muted">Các đơn hàng mới sẽ hiển thị tại đây</p>
+            </div>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Initialize DataTable
+            $('#orderTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Vietnamese.json"
+                },
+                "responsive": true,
+                "pageLength": 10,
+                "order": [[0, "desc"]]
+            });
+
+            // Handle status change
+            $('.status-select').change(function() {
+                const orderId = $(this).data('order-id');
+                const newStatus = $(this).val();
+                
+                $.ajax({
+                    url: '@Url.Action("UpdateStatus")',
+                    type: 'POST',
+                    data: {
+                        id: orderId,
+                        status: newStatus
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            showToast('Thành công!', response.message, 'success');
+                            // Update row status attribute
+                            $(`tr:has([data-order-id="${orderId}"])`).attr('data-status', newStatus);
+                        } else {
+                            showToast('Lỗi!', response.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        showToast('Lỗi!', 'Không thể cập nhật trạng thái', 'error');
+                    }
+                });
+            });
+        });
+
+        // Filter orders by status
+        function filterOrders(status) {
+            const table = $('#orderTable').DataTable();
+            
+            if (status === 'all') {
+                table.search('').draw();
+            } else {
+                table.search(status).draw();
+            }
+
+            // Update active button
+            $('.btn-group button').removeClass('active');
+            event.target.classList.add('active');
+        }
+
+        // Load order statistics
+        function loadOrderStats() {
+            $.get('@Url.Action("GetOrderStats")', function(response) {
+                if (response.success) {
+                    $('#totalOrders').text(response.totalOrders);
+                    $('#totalRevenue').text(formatPrice(response.totalRevenue) + ' VNĐ');
+                    $('#statsCards').fadeIn();
+                }
+            });
+        }
+
+        // Format price
+        function formatPrice(price) {
+            return new Intl.NumberFormat('vi-VN').format(price);
+        }
+
+        // Toast notification
+        function showToast(title, message, type) {
+            const toastClass = type === 'success' ? 'bg-success' : 'bg-danger';
+            const icon = type === 'success' ? 'bi-check-circle' : 'bi-exclamation-triangle';
+            
+            const toastHtml = `
+                <div class="toast ${toastClass} text-white" role="alert">
+                    <div class="toast-header ${toastClass} text-white border-0">
+                        <i class="bi ${icon} me-2"></i>
+                        <strong class="me-auto">${title}</strong>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body">${message}</div>
+                </div>
+            `;
+            
+            if (!$('#toast-container').length) {
+                $('body').append('<div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3"></div>');
+            }
+            
+            const $toast = $(toastHtml);
+            $('#toast-container').append($toast);
+            
+            const toast = new bootstrap.Toast($toast[0]);
+            toast.show();
+            
+            $toast.on('hidden.bs.toast', function() {
+                $(this).remove();
+            });
+        }
+    </script>
+    
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script>
+}

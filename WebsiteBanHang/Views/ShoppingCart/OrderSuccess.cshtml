@@ -1,0 +1,35 @@
+﻿<!-- Views/ShoppingCart/OrderSuccess.cshtml -->
+@model WebsiteBanHang.Models.Order
+@{
+    ViewData["Title"] = "Đặt hàng thành công";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- Success Message -->
+            <div class="text-center mb-5">
+                <div class="mb-4">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+                </div>
+                <h1 class="text-success mb-3">Đặt hàng thành công!</h1>
+                <p class="lead text-muted">
+                    Cảm ơn bạn đã đặt hàng. Chúng tôi sẽ xử lý đơn hàng và giao đến bạn sớm nhất có thể.
+                </p>
+            </div>
+
+            <!-- Order Info -->
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Thông tin đơn hàng #@Model.Id
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="text-muted">Mã đơn hàng:</label>
+                            <p class="fw-bold">#@Model.Id</p>
+                        </div>
+                        <div class=" col-md-

@@ -1,0 +1,414 @@
+﻿<!-- Areas/Admin/Views/Order/Details.cshtml -->
+@model WebsiteBanHang.Models.Order
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng #" + Model.Id;
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-eye me-2"></i>Chi tiết đơn hàng #@Model.Id</h2>
+    <div>
+        <button class="btn btn-secondary" onclick="window.print()">
+            <i class="bi bi-printer me-2"></i>In đơn hàng
+        </button>
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i>Quay lại danh sách
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <!-- Thông tin đơn hàng -->
+        <div class="card card-admin mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-info-circle me-2"></i>Thông tin đơn hàng
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Mã đơn hàng</label>
+                        <p class="fs-5 fw-bold text-primary">#@Model.Id</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Ngày đặt hàng</label>
+                        <p class="fs-6 fw-bold">@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Tổng tiền</label>
+                        <p class="fs-4 fw-bold text-success">@Model.TotalPrice.ToString("#,##0") VNĐ</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Trạng thái đơn hàng</label>
+                        <div>
+                            <select class="form-select" id="orderStatus" data-order-id="@Model.Id">
+                                <option value="Đang xử lý" @(Model.OrderStatus == "Đang xử lý" ? "selected" : "")>Đang xử lý</option>
+                                <option value="Đã xác nhận" @(Model.OrderStatus == "Đã xác nhận" ? "selected" : "")>Đã xác nhận</option>
+                                <option value="Đang giao" @(Model.OrderStatus == "Đang giao" ? "selected" : "")>Đang giao</option>
+                                <option value="Hoàn thành" @(Model.OrderStatus == "Hoàn thành" ? "selected" : "")>Hoàn thành</option>
+                                <option value="Đã hủy" @(Model.OrderStatus == "Đã hủy" ? "selected" : "")>Đã hủy</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Phương thức thanh toán</label>
+                        <p class="fw-bold">
+                            @if (Model.PaymentMethod == "COD")
+                            {
+                                <i class="bi bi-cash text-success me-2"></i>Thanh toán khi nhận hàng
+                            }
+                            else if (Model.PaymentMethod == "Banking")
+                            {
+                                <i class="bi bi-bank text-primary me-2"></i>Chuyển khoản ngân hàng
+                            }
+                            else
+                            {
+                                <i class="bi bi-wallet2 text-danger me-2"></i>@Model.PaymentMethod
+                            }
+                        </p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Tổng số sản phẩm</label>
+                        <p class="fw-bold">@Model.TotalItems sản phẩm</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thông tin khách hàng -->
+        <div class="card card-admin mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-person me-2"></i>Thông tin khách hàng
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Họ và tên</label>
+                        <p class="fw-bold">@Model.CustomerName</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Số điện thoại</label>
+                        <p class="fw-bold">@Model.CustomerPhone</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Email</label>
+                        <p class="fw-bold">@Model.ApplicationUser?.Email</p>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label text-muted">Tài khoản</label>
+                        <p class="fw-bold">@Model.ApplicationUser?.FullName</p>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label text-muted">Địa chỉ giao hàng</label>
+                    <div class="bg-light p-3 rounded">
+                        <p class="mb-0 fw-bold">@Model.ShippingAddress</p>
+                    </div>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.Notes))
+                {
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Ghi chú của khách hàng</label>
+                        <div class="bg-light p-3 rounded">
+                            <p class="mb-0">@Model.Notes</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Chi tiết sản phẩm -->
+        <div class="card card-admin">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-bag-check me-2"></i>Chi tiết sản phẩm
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <th>Danh mục</th>
+                                <th>Đơn giá</th>
+                                <th>Số lượng</th>
+                                <th>Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.OrderDetails)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            @if (!string.IsNullOrEmpty(item.Product?.ImageUrl))
+                                            {
+                                                <img src="@item.Product.ImageUrl" alt="@item.Product.Name" 
+                                                     class="me-3 rounded" style="width: 50px; height: 50px; object-fit: cover;">
+                                            }
+                                            else
+                                            {
+                                                <div class="bg-light rounded me-3 d-flex align-items-center justify-content-center" 
+                                                     style="width: 50px; height: 50px;">
+                                                    <i class="bi bi-image text-muted"></i>
+                                                </div>
+                                            }
+                                            <div>
+                                                <strong>@item.Product?.Name</strong>
+                                                <br>
+                                                <small class="text-muted">ID: #@item.ProductId</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">@item.Product?.Category?.Name</span>
+                                    </td>
+                                    <td>
+                                        <strong>@item.Price.ToString("#,##0") VNĐ</strong>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-primary fs-6">@item.Quantity</span>
+                                    </td>
+                                    <td>
+                                        <strong class="text-success">@item.Total.ToString("#,##0") VNĐ</strong>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        <tfoot class="table-light">
+                            <tr>
+                                <td colspan="4" class="text-end"><strong>Tổng cộng:</strong></td>
+                                <td><strong class="text-success fs-5">@Model.TotalPrice.ToString("#,##0") VNĐ</strong></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <!-- Trạng thái đơn hàng -->
+        <div class="card card-admin mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0 text-primary">
+                    <i class="bi bi-clipboard-check me-2"></i>Trạng thái đơn hàng
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="timeline">
+                    <div class="timeline-item @(new[] {"Đang xử lý", "Đã xác nhận", "Đang giao", "Hoàn thành"}.Contains(Model.OrderStatus) ? "completed" : "")">
+                        <div class="timeline-marker bg-success">
+                            <i class="bi bi-check text-white"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h6>Đơn hàng đã được tạo</h6>
+                            <small class="text-muted">@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</small>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item @(new[] {"Đã xác nhận", "Đang giao", "Hoàn thành"}.Contains(Model.OrderStatus) ? "completed" : Model.OrderStatus == "Đang xử lý" ? "current" : "")">
+                        <div class="timeline-marker @(new[] {"Đã xác nhận", "Đang giao", "Hoàn thành"}.Contains(Model.OrderStatus) ? "bg-success" : Model.OrderStatus == "Đang xử lý" ? "bg-warning" : "bg-secondary")">
+                            <i class="bi bi-@(new[] {"Đã xác nhận", "Đang giao", "Hoàn thành"}.Contains(Model.OrderStatus) ? "check" : "clock") text-white"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h6>Xác nhận đơn hàng</h6>
+                            <small class="text-muted">Chờ xác nhận</small>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item @(new[] {"Đang giao", "Hoàn thành"}.Contains(Model.OrderStatus) ? "completed" : Model.OrderStatus == "Đã xác nhận" ? "current" : "")">
+                        <div class="timeline-marker @(new[] {"Đang giao", "Hoàn thành"}.Contains(Model.OrderStatus) ? "bg-success" : Model.OrderStatus == "Đã xác nhận" ? "bg-warning" : "bg-secondary")">
+                            <i class="bi bi-@(new[] {"Đang giao", "Hoàn thành"}.Contains(Model.OrderStatus) ? "check" : "truck") text-white"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h6>Đang giao hàng</h6>
+                            <small class="text-muted">Đang vận chuyển</small>
+                        </div>
+                    </div>
+                    
+                    <div class="timeline-item @(Model.OrderStatus == "Hoàn thành" ? "completed" : Model.OrderStatus == "Đang giao" ? "current" : "")">
+                        <div class="timeline-marker @(Model.OrderStatus == "Hoàn thành" ? "bg-success" : Model.OrderStatus == "Đang giao" ? "bg-warning" : "bg-secondary")">
+                            <i class="bi bi-@(Model.OrderStatus == "Hoàn thành" ? "check" : "house") text-white"></i>
+                        </div>
+                        <div class="timeline-content">
+                            <h6>Giao hàng thành công</h6>
+                            <small class="text-muted">@(Model.OrderStatus == "Hoàn thành" ? "Đã hoàn thành" : "Chưa hoàn thành")</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thao tác nhanh -->
+        <div class="card card-admin mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-gear me-2"></i>Thao tác
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <button class="btn btn-primary" onclick="updateOrderStatus()">
+                        <i class="bi bi-arrow-repeat me-2"></i>Cập nhật trạng thái
+                    </button>
+                    <button class="btn btn-info" onclick="sendNotification()">
+                        <i class="bi bi-bell me-2"></i>Gửi thông báo
+                    </button>
+                    <a href="mailto:@Model.ApplicationUser?.Email" class="btn btn-success">
+                        <i class="bi bi-envelope me-2"></i>Gửi email
+                    </a>
+                    <a href="tel:@Model.CustomerPhone" class="btn btn-warning">
+                        <i class="bi bi-telephone me-2"></i>Gọi điện thoại
+                    </a>
+                    <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger" 
+                       onclick="return confirm('Bạn có chắc muốn xóa đơn hàng này?')">
+                        <i class="bi bi-trash me-2"></i>Xóa đơn hàng
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thông tin bổ sung -->
+        <div class="card card-admin">
+            <div class="card-header">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-info-circle me-2"></i>Thông tin bổ sung
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-2">
+                    <strong>Phí vận chuyển:</strong>
+                    <span class="text-success">Miễn phí</span>
+                </div>
+                <div class="mb-2">
+                    <strong>Thời gian giao hàng dự kiến:</strong>
+                    <span>1-3 ngày làm việc</span>
+                </div>
+                <div class="mb-2">
+                    <strong>Đơn vị vận chuyển:</strong>
+                    <span>Giao hàng tiết kiệm</span>
+                </div>
+                <div class="mb-2">
+                    <strong>Mã vận đơn:</strong>
+                    <span class="text-primary">#GHN@Model.Id.ToString().PadLeft(8, '0')</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 30px;
+    }
+
+    .timeline-item {
+        position: relative;
+        margin-bottom: 20px;
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: -40px;
+        top: 0;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: -25px;
+        top: 15px;
+        bottom: 0;
+        width: 2px;
+        background-color: #dee2e6;
+    }
+
+    .timeline-item.completed .timeline-marker {
+        background-color: #198754 !important;
+    }
+
+    .timeline-item.current .timeline-marker {
+        background-color: #ffc107 !important;
+    }
+
+    @media print {
+        .btn, .card-header { display: none !important; }
+        .card { border: none !important; box-shadow: none !important; }
+    }
+</style>
+
+@section Scripts {
+    <script>
+        function updateOrderStatus() {
+            const orderId = $('#orderStatus').data('order-id');
+            const newStatus = $('#orderStatus').val();
+            
+            $.ajax({
+                url: '@Url.Action("UpdateStatus")',
+                type: 'POST',
+                data: {
+                    id: orderId,
+                    status: newStatus
+                },
+                success: function(response) {
+                    if (response.success) {
+                        showToast('Thành công!', response.message, 'success');
+                        setTimeout(() => location.reload(), 1000);
+                    } else {
+                        showToast('Lỗi!', response.message, 'error');
+                    }
+                },
+                error: function() {
+                    showToast('Lỗi!', 'Không thể cập nhật trạng thái', 'error');
+                }
+            });
+        }
+
+        function sendNotification() {
+            // Simulate sending notification
+            showToast('Thông báo!', 'Đã gửi thông báo cập nhật đơn hàng đến khách hàng', 'success');
+        }
+
+        function showToast(title, message, type) {
+            const toastClass = type === 'success' ? 'bg-success' : 'bg-danger';
+            const icon = type === 'success' ? 'bi-check-circle' : 'bi-exclamation-triangle';
+            
+            const toastHtml = `
+                <div class="toast ${toastClass} text-white" role="alert">
+                    <div class="toast-header ${toastClass} text-white border-0">
+                        <i class="bi ${icon} me-2"></i>
+                        <strong class="me-auto">${title}</strong>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body">${message}</div>
+                </div>
+            `;
+            
+            if (!$('#toast-container').length) {
+                $('body').append('<div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3"></div>');
+            }
+            
+            const $toast = $(toastHtml);
+            $('#toast-container').append($toast);
+            
+            const toast = new bootstrap.Toast($toast[0]);
+            toast.show();
+            
+            $toast.on('hidden.bs.toast', function() {
+                $(this).remove();
+            });
+        }
+    </script>
+}

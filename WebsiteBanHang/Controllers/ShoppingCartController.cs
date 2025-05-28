@@ -10,14 +10,17 @@ namespace WebsiteBanHang.Controllers
     {
         private readonly IProductRepository _productRepository;
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IOrderRepository _orderRepository;
         private const string CartSessionKey = "Cart";
 
         public ShoppingCartController(
             IProductRepository productRepository,
-            UserManager<ApplicationUser> userManager)
+            UserManager<ApplicationUser> userManager,
+            IOrderRepository orderRepository)
         {
             _productRepository = productRepository;
             _userManager = userManager;
+            _orderRepository = orderRepository;
         }
 
         // Hiển thị giỏ hàng
