@@ -1,0 +1,282 @@
+﻿<!-- Views/Order/Details.cshtml (cho User) -->
+@model WebsiteBanHang.Models.Order
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng #" + Model.Id;
+}
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-receipt me-2"></i>Chi tiết đơn hàng #@Model.Id</h2>
+        <div>
+            <button class="btn btn-secondary" onclick="window.print()">
+                <i class="bi bi-printer me-2"></i>In đơn hàng
+            </button>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Đơn hàng của tôi
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Order Status -->
+            <div class="card mb-4">
+                <div class="card-header bg-@(Model.OrderStatus == "Hoàn thành" ? "success" : 
+                                          Model.OrderStatus == "Đã hủy" ? "danger" : 
+                                          Model.OrderStatus == "Đang giao" ? "info" : "warning") text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-@(Model.OrderStatus == "Hoàn thành" ? "check-circle" : 
+                                         Model.OrderStatus == "Đã hủy" ? "x-circle" : 
+                                         Model.OrderStatus == "Đang giao" ? "truck" : "clock") me-2"></i>
+                        Trạng thái: @Model.OrderStatus
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.OrderStatus == "Đang xử lý")
+                    {
+                        <p class="mb-2"><i class="bi bi-info-circle text-info me-2"></i>Đơn hàng của bạn đang được xử lý. Chúng tôi sẽ sớm xác nhận và giao hàng.</p>
+                        <button class="btn btn-danger btn-sm" onclick="cancelOrder(@Model.Id)">
+                            <i class="bi bi-x-circle me-2"></i>Hủy đơn hàng
+                        </button>
+                    }
+                    else if (Model.OrderStatus == "Đã xác nhận")
+                    {
+                        <p class="mb-0"><i class="bi bi-check-circle text-success me-2"></i>Đơn hàng đã được xác nhận và đang chuẩn bị giao hàng.</p>
+                    }
+                    else if (Model.OrderStatus == "Đang giao")
+                    {
+                        <p class="mb-2"><i class="bi bi-truck text-info me-2"></i>Đơn hàng đang được giao đến bạn. Vui lòng chuẩn bị nhận hàng.</p>
+                        <p class="mb-0"><strong>Mã vận đơn:</strong> <span class="text-primary">#GHN@Model.Id.ToString().PadLeft(8, '0')</span></p>
+                    }
+                    else if (Model.OrderStatus == "Hoàn thành")
+                    {
+                        <p class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Đơn hàng đã được giao thành công. Cảm ơn bạn đã mua hàng!</p>
+                        <button class="btn btn-success btn-sm me-2" onclick="reorder(@Model.Id)">
+                            <i class="bi bi-arrow-repeat me-2"></i>Mua lại
+                        </button>
+                        <button class="btn btn-warning btn-sm">
+                            <i class="bi bi-star me-2"></i>Đánh giá sản phẩm
+                        </button>
+                    }
+                    else if (Model.OrderStatus == "Đã hủy")
+                    {
+                        <p class="mb-2"><i class="bi bi-x-circle text-danger me-2"></i>Đơn hàng đã bị hủy.</p>
+                        <button class="btn btn-primary btn-sm" onclick="reorder(@Model.Id)">
+                            <i class="bi bi-arrow-repeat me-2"></i>Đặt lại đơn hàng
+                        </button>
+                    }
+                </div>
+            </div>
+
+            <!-- Order Items -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-bag-check me-2"></i>Sản phẩm đã đặt (@Model.OrderDetails.Count sản phẩm)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @foreach (var item in Model.OrderDetails)
+                    {
+                        <div class="d-flex justify-content-between align-items-center py-3 @(item != Model.OrderDetails.Last() ? "border-bottom" : "")">
+                            <div class="d-flex align-items-center flex-grow-1">
+                                @if (!string.IsNullOrEmpty(item.Product?.ImageUrl))
+                                {
+                                    <img src="@item.Product.ImageUrl" alt="@item.Product.Name" 
+                                         class="me-3 rounded" style="width: 80px; height: 80px; object-fit: cover;">
+                                }
+                                else
+                                {
+                                    <div class="bg-light rounded me-3 d-flex align-items-center justify-content-center" 
+                                         style="width: 80px; height: 80px;">
+                                        <i class="bi bi-image text-muted fs-1"></i>
+                                    </div>
+                                }
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">@item.Product?.Name</h6>
+                                    <p class="text-muted mb-1">@item.Product?.Category?.Name</p>
+                                    <p class="mb-0">
+                                        <span class="text-success fw-bold">@item.Price.ToString("#,##0") VNĐ</span>
+                                        <span class="text-muted"> × @item.Quantity</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <strong class="text-success fs-5">@item.Total.ToString("#,##0") VNĐ</strong>
+                            </div>
+                        </div>
+                    }
+                    
+                    <!-- Total -->
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                        <h5 class="mb-0">Tổng cộng:</h5>
+                        <h4 class="mb-0 text-success">@Model.TotalPrice.ToString("#,##0") VNĐ</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Order Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Thông tin đơn hàng</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-muted small">Mã đơn hàng</label>
+                        <p class="fw-bold mb-0">#@Model.Id</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small">Ngày đặt hàng</label>
+                        <p class="fw-bold mb-0">@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small">Phương thức thanh toán</label>
+                        <p class="fw-bold mb-0">
+                            @if (Model.PaymentMethod == "COD")
+                            {
+                                <i class="bi bi-cash text-success me-1"></i>Thanh toán khi nhận hàng
+                            }
+                            else if (Model.PaymentMethod == "Banking")
+                            {
+                                <i class="bi bi-bank text-primary me-1"></i>Chuyển khoản ngân hàng
+                            }
+                            else
+                            {
+                                <i class="bi bi-wallet2 text-danger me-1"></i>@Model.PaymentMethod
+                            }
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Shipping Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-truck me-2"></i>Thông tin giao hàng</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-muted small">Người nhận</label>
+                        <p class="fw-bold mb-0">@Model.CustomerName</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small">Số điện thoại</label>
+                        <p class="fw-bold mb-0">@Model.CustomerPhone</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small">Địa chỉ giao hàng</label>
+                        <p class="fw-bold mb-0">@Model.ShippingAddress</p>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.Notes))
+                    {
+                        <div class="mb-3">
+                            <label class="text-muted small">Ghi chú</label>
+                            <p class="fw-bold mb-0">@Model.Notes</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Help -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-headset me-2"></i>Cần hỗ trợ?</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">Liên hệ với chúng tôi nếu bạn có bất kỳ thắc mắc nào về đơn hàng:</p>
+                    <div class="d-grid gap-2">
+                        <a href="tel:19009999" class="btn btn-outline-primary">
+                            <i class="bi bi-telephone me-2"></i>Hotline: 1900 9999
+                        </a>
+                        <a href="mailto:support@shoppro.com" class="btn btn-outline-success">
+                            <i class="bi bi-envelope me-2"></i>Email hỗ trợ
+                        </a>
+                        <button class="btn btn-outline-info">
+                            <i class="bi bi-chat-dots me-2"></i>Chat trực tuyến
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Same JavaScript functions as in Index.cshtml
+        function cancelOrder(orderId) {
+            if (confirm('Bạn có chắc muốn hủy đơn hàng này không?')) {
+                $.ajax({
+                    url: '@Url.Action("Cancel")',
+                    type: 'POST',
+                    data: { id: orderId },
+                    success: function(response) {
+                        if (response.success) {
+                            showToast('Thành công!', response.message, 'success');
+                            setTimeout(() => location.reload(), 1000);
+                        } else {
+                            showToast('Lỗi!', response.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        showToast('Lỗi!', 'Không thể hủy đơn hàng', 'error');
+                    }
+                });
+            }
+        }
+
+        function reorder(orderId) {
+            if (confirm('Bạn có muốn thêm tất cả sản phẩm trong đơn hàng này vào giỏ hàng không?')) {
+                $.ajax({
+                    url: '@Url.Action("Reorder")',
+                    type: 'POST',
+                    data: { id: orderId },
+                    success: function(response) {
+                        if (response.success) {
+                            showToast('Thành công!', response.message, 'success');
+                            if (response.redirect) {
+                                setTimeout(() => window.location.href = response.redirect, 1000);
+                            }
+                        } else {
+                            showToast('Lỗi!', response.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        showToast('Lỗi!', 'Không thể mua lại đơn hàng', 'error');
+                    }
+                });
+            }
+        }
+
+        function showToast(title, message, type) {
+            const toastClass = type === 'success' ? 'bg-success' : 'bg-danger';
+            const icon = type === 'success' ? 'bi-check-circle' : 'bi-exclamation-triangle';
+            
+            const toastHtml = `
+                <div class="toast ${toastClass} text-white" role="alert">
+                    <div class="toast-header ${toastClass} text-white border-0">
+                        <i class="bi ${icon} me-2"></i>
+                        <strong class="me-auto">${title}</strong>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body">${message}</div>
+                </div>
+            `;
+            
+            if (!$('#toast-container').length) {
+                $('body').append('<div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3"></div>');
+            }
+            
+            const $toast = $(toastHtml);
+            $('#toast-container').append($toast);
+            
+            const toast = new bootstrap.Toast($toast[0]);
+            toast.show();
+            
+            $toast.on('hidden.bs.toast', function() {
+                $(this).remove();
+            });
+        }
+    </script>
