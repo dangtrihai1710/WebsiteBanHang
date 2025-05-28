@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Authorization;
 using WebsiteBanHang.Models;
 using WebsiteBanHang.Repositories;
 
 namespace WebsiteBanHang.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = SD.Role_Admin)] // Chỉ cho phép Admin truy cập
     public class ProductController : Controller
     {
         private readonly IProductRepository _productRepository;
@@ -52,7 +54,6 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
         {
             try
             {
-                // Loại bỏ ImageUrl, Category và Images khỏi ModelState validation
                 ModelState.Remove("ImageUrl");
                 ModelState.Remove("Category");
                 ModelState.Remove("Images");
@@ -69,7 +70,6 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
-                // Nếu validation thất bại, tải lại các danh mục
                 var categories = await _categoryRepository.GetAllAsync();
                 ViewBag.Categories = new SelectList(categories, "Id", "Name");
                 return View(product);
@@ -136,7 +136,6 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
 
             try
             {
-                // Loại bỏ các thuộc tính không cần validation
                 ModelState.Remove("ImageUrl");
                 ModelState.Remove("Category");
                 ModelState.Remove("Images");
@@ -150,13 +149,11 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
                         return RedirectToAction(nameof(Index));
                     }
 
-                    // Cập nhật thuộc tính
                     existingProduct.Name = product.Name;
                     existingProduct.Price = product.Price;
                     existingProduct.Description = product.Description;
                     existingProduct.CategoryId = product.CategoryId;
 
-                    // Xử lý upload hình ảnh
                     if (imageUrl != null && imageUrl.Length > 0)
                     {
                         existingProduct.ImageUrl = await SaveImage(imageUrl);
@@ -167,7 +164,6 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
-                // Tải lại danh mục nếu validation thất bại
                 var categories = await _categoryRepository.GetAllAsync();
                 ViewBag.Categories = new SelectList(categories, "Id", "Name", product.CategoryId);
                 return View(product);
@@ -207,13 +203,6 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
         {
             try
             {
-                var product = await _productRepository.GetByIdAsync(id);
-                if (product == null)
-                {
-                    TempData["ErrorMessage"] = "Không tìm thấy sản phẩm!";
-                    return RedirectToAction(nameof(Index));
-                }
-
                 await _productRepository.DeleteAsync(id);
                 TempData["SuccessMessage"] = "Xóa sản phẩm thành công!";
                 return RedirectToAction(nameof(Index));
@@ -229,18 +218,15 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
         {
             try
             {
-                // Tạo thư mục images nếu chưa tồn tại
                 var imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
                 if (!Directory.Exists(imagesFolder))
                 {
                     Directory.CreateDirectory(imagesFolder);
                 }
 
-                // Tạo tên file duy nhất
                 var fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
                 var filePath = Path.Combine(imagesFolder, fileName);
 
-                // Lưu file
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
                     await image.CopyToAsync(fileStream);

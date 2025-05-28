@@ -9,7 +9,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-// QUAN TRỌNG: Sử dụng ApplicationUser thay vì IdentityUser
+// Cấu hình Identity với ApplicationUser
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
     options.Password.RequireDigit = false;
     options.Password.RequireLowercase = false;
@@ -20,9 +20,17 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-// Add services to the container.
+// Cấu hình đường dẫn khi bị từ chối truy cập
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.LoginPath = "/Identity/Account/Login";
+    options.LogoutPath = "/Identity/Account/Logout";
+    options.AccessDeniedPath = "/AccessDenied/Index";
+});
+
+// Add services to the container
 builder.Services.AddControllersWithViews();
-builder.Services.AddRazorPages(); // Cần thiết nếu dùng Identity UI
+builder.Services.AddRazorPages();
 
 // Đăng ký Repositories
 builder.Services.AddScoped<IProductRepository, EFProductRepository>();
@@ -30,7 +38,7 @@ builder.Services.AddScoped<ICategoryRepository, EFCategoryRepository>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
@@ -42,19 +50,19 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-// QUAN TRỌNG: Thứ tự này rất quan trọng
+// QUAN TRỌNG: Thứ tự Authentication và Authorization
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Routing
+// QUAN TRỌNG: Cấu hình routing cho Admin Area TRƯỚC routing mặc định
 app.MapControllerRoute(
-    name: "areas",
-    pattern: "{area:exists}/{controller=Home}/{action=Index}/{id?}");
+    name: "admin",
+    pattern: "{area:exists}/{controller=Admin}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.MapRazorPages(); // Cần thiết nếu dùng Identity UI
+app.MapRazorPages();
 
 app.Run();

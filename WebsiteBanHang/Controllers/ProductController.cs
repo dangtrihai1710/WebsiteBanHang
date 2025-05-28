@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebsiteBanHang.Models;
 using WebsiteBanHang.Repositories;
-using Microsoft.AspNetCore.Authorization;
+
 namespace WebsiteBanHang.Controllers
 {
-    [Area ("Admin")]
-    [Authorize(Roles = SD.Role_Admin)]// Chỉ cho phép người dùng có vai trò Admin truy cập vào các chức năng này
     public class ProductController : Controller
     {
         private readonly IProductRepository _productRepository;
@@ -17,7 +15,7 @@ namespace WebsiteBanHang.Controllers
             _categoryRepository = categoryRepository;
         }
 
-        // Chỉ giữ lại các chức năng xem cho người dùng
+        // Chỉ giữ lại các chức năng xem cho người dùng thông thường
         public async Task<IActionResult> Index()
         {
             var products = await _productRepository.GetAllAsync();
