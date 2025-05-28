@@ -7,11 +7,24 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <!-- DataTables CSS (có thể cần cho các trang admin) -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
+
     <style>
+        body {
+            background-color: #f8f9fa;
+        }
+
         .sidebar {
             min-height: 100vh;
             background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 250px;
+            z-index: 1000;
         }
 
             .sidebar .nav-link {
@@ -20,9 +33,12 @@
                 border-radius: 8px;
                 margin: 2px 10px;
                 transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
             }
 
-                .sidebar .nav-link:hover, .sidebar .nav-link.active {
+                .sidebar .nav-link:hover,
+                .sidebar .nav-link.active {
                     color: white;
                     background-color: rgba(255,255,255,0.1);
                     transform: translateX(5px);
@@ -31,16 +47,24 @@
                 .sidebar .nav-link i {
                     margin-right: 10px;
                     width: 20px;
+                    text-align: center;
                 }
 
         .main-content {
-            background-color: #f8f9fa;
+            margin-left: 250px;
             min-height: 100vh;
+            padding: 0;
         }
 
         .navbar-admin {
             background: white !important;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .content-area {
+            padding: 2rem;
         }
 
         .card-admin {
@@ -48,103 +72,195 @@
             border-radius: 15px;
             box-shadow: 0 5px 15px rgba(0,0,0,0.08);
             transition: transform 0.3s ease;
+            margin-bottom: 1.5rem;
         }
 
             .card-admin:hover {
-                transform: translateY(-5px);
+                transform: translateY(-2px);
             }
 
         .btn-admin {
             border-radius: 8px;
             padding: 8px 20px;
             font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+            .btn-admin:hover {
+                transform: translateY(-2px);
+            }
+
+        /* Toast container */
+        .toast-container {
+            z-index: 1055;
+        }
+
+        /* Loading overlay */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+            .loading-overlay.show {
+                display: flex;
+            }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .sidebar
+
+        {
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.show {
+            transform: translateX(0);
+        }
+
+        .main-content {
+            margin-left: 0;
+        }
+
+        }
+
+        /* DataTable custom styles */
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            padding: 0.375rem 0.75rem;
+            margin: 0 0.125rem;
+            border-radius: 0.375rem;
+        }
+
+        /* Alert improvements */
+        .alert {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <nav class="col-md-3 col-lg-2 d-md-block sidebar collapse">
-                <div class="position-sticky pt-3">
-                    <div class="text-center mb-4">
-                        <h4 class="text-white">
-                            <i class="bi bi-shield-check"></i>
-                            Admin Panel
-                        </h4>
-                    </div>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="text-center">
+            <div class="spinner-border text-light" role="status" style="width: 3rem; height: 3rem;">
+                <span class="visually-hidden">Đang tải...</span>
+            </div>
+            <div class="text-white mt-3">Đang xử lý...</div>
+        </div>
+    </div>
 
-                    <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="Admin" asp-controller="Admin" asp-action="Index">
-                                <i class="bi bi-speedometer2"></i>
-                                Dashboard
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="Admin" asp-controller="Product" asp-action="Index">
-                                <i class="bi bi-box-seam"></i>
-                                Quản lý sản phẩm
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="Admin" asp-controller="Category" asp-action="Index">
-                                <i class="bi bi-tags"></i>
-                                Quản lý danh mục
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="Admin" asp-controller="Order" asp-action="Index">
-                                <i class="bi bi-cart-check"></i>
-                                Quản lý đơn hàng
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#" onclick="alert('Chức năng đang phát triển')">
-                                <i class="bi bi-people"></i>
-                                Quản lý người dùng
-                            </a>
-                        </li>
-                        <hr class="text-white-50">
-                        <li class="nav-item">
-                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
-                                <i class="bi bi-arrow-left"></i>
-                                Về trang chủ
-                            </a>
-                        </li>
-                    </ul>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <div class="position-sticky pt-3">
+                <div class="text-center mb-4">
+                    <h4 class="text-white mb-0">
+                        <i class="bi bi-shield-check"></i>
+                        Admin Panel
+                    </h4>
+                    <small class="text-white-50">Quản trị hệ thống</small>
+                </div>
+
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Admin/Admin/Index">
+                            <i class="bi bi-speedometer2"></i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Admin/Product/Index">
+                            <i class="bi bi-box-seam"></i>
+                            Quản lý sản phẩm
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Admin/Category/Index">
+                            <i class="bi bi-tags"></i>
+                            Quản lý danh mục
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Admin/Order/Index">
+                            <i class="bi bi-cart-check"></i>
+                            Quản lý đơn hàng
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showComingSoon()">
+                            <i class="bi bi-people"></i>
+                            Quản lý người dùng
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="showComingSoon()">
+                            <i class="bi bi-graph-up"></i>
+                            Báo cáo & Thống kê
+                        </a>
+                    </li>
+                    <hr class="text-white-50 mx-3">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="bi bi-arrow-left"></i>
+                            Về trang chủ
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Main content -->
+        <div class="main-content flex-grow-1">
+            <!-- Top navbar -->
+            <nav class="navbar navbar-expand-lg navbar-light navbar-admin">
+                <div class="container-fluid">
+                    <div class="d-flex align-items-center">
+                        <button class="btn btn-outline-secondary d-md-none me-3" type="button" onclick="toggleSidebar()">
+                            <i class="bi bi-list"></i>
+                        </button>
+                        <h5 class="mb-0">@ViewData["Title"]</h5>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <span class="me-3 text-muted small">
+                            <i class="bi bi-clock"></i>
+                            <span id="currentTime"></span>
+                        </span>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-primary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
+                                <i class="bi bi-person-circle"></i>
+                                Admin
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><h6 class="dropdown-header">Tài khoản Admin</h6></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-person me-2"></i> Hồ sơ cá nhân</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-gear me-2"></i> Cài đặt hệ thống</a></li>
+                                <li><a class="dropdown-item" href="#"><i class="bi bi-bell me-2"></i> Thông báo</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="/"><i class="bi bi-house me-2"></i> Xem website</a></li>
+                                <li><a class="dropdown-item text-danger" href="#" onclick="confirmLogout()"><i class="bi bi-box-arrow-right me-2"></i> Đăng xuất</a></li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </nav>
 
-            <!-- Main content -->
-            <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 main-content">
-                <!-- Top navbar -->
-                <nav class="navbar navbar-expand-lg navbar-light navbar-admin mb-4">
-                    <div class="container-fluid">
-                        <h5 class="mb-0">@ViewData["Title"]</h5>
-                        <div class="d-flex">
-                            <div class="dropdown">
-                                <button class="btn btn-outline-primary dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
-                                    <i class="bi bi-person-circle"></i>
-                                    Admin
-                                </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="#"><i class="bi bi-person"></i> Hồ sơ</a></li>
-                                    <li><a class="dropdown-item" href="#"><i class="bi bi-gear"></i> Cài đặt</a></li>
-                                    <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item" href="/"><i class="bi bi-box-arrow-right"></i> Về trang chủ</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </nav>
-
+            <!-- Content Area -->
+            <div class="content-area">
                 <!-- Alerts -->
                 @if (TempData["SuccessMessage"] != null)
                 {
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         <i class="bi bi-check-circle me-2"></i>
-                        @TempData["SuccessMessage"]
+                        <strong>Thành công!</strong> @TempData["SuccessMessage"]
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 }
@@ -153,38 +269,204 @@
                 {
                     <div class="alert alert-danger alert-dismissible fade show" role="alert">
                         <i class="bi bi-exclamation-triangle me-2"></i>
-                        @TempData["ErrorMessage"]
+                        <strong>Lỗi!</strong> @TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                }
+
+                @if (TempData["InfoMessage"] != null)
+                {
+                    <div class="alert alert-info alert-dismissible fade show" role="alert">
+                        <i class="bi bi-info-circle me-2"></i>
+                        <strong>Thông báo!</strong> @TempData["InfoMessage"]
                         <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                     </div>
                 }
 
                 <!-- Page content -->
-                <div class="content-wrapper">
-                    @RenderBody()
-                </div>
-            </main>
+                @RenderBody()
+            </div>
         </div>
     </div>
 
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;"></div>
+
+    <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
-    <script>
-        // Auto-close alerts after 5 seconds
-        setTimeout(function () {
-            $('.alert').alert('close');
-        }, 5000);
+    <!-- DataTables JS (có thể cần cho các trang admin) -->
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script>
 
-        // Active nav link highlighting
+    <!-- Admin Global Scripts -->
+    <script>
         $(document).ready(function() {
-            var path = window.location.pathname;
+            console.log('Admin Layout loaded successfully!');
+
+            // Initialize admin panel
+            initializeAdminPanel();
+
+            // Auto-close alerts after 5 seconds
+            setTimeout(function () {
+                $('.alert').alert('close');
+            }, 5000);
+
+            // Update current time
+            updateCurrentTime();
+            setInterval(updateCurrentTime, 1000);
+
+            // Active nav link highlighting
+            highlightActiveNavLink();
+
+            // Global AJAX setup
+            setupGlobalAjax();
+
+            // Initialize tooltips
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+        });
+
+        function initializeAdminPanel() {
+            // Add any initialization code here
+            console.log('Admin panel initialized');
+        }
+
+        function updateCurrentTime() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('vi-VN');
+            $('#currentTime').text(timeString);
+        }
+
+        function highlightActiveNavLink() {
+            const currentPath = window.location.pathname.toLowerCase();
             $('.sidebar .nav-link').each(function() {
-                if ($(this).attr('href') === path) {
+                const href = $(this).attr('href');
+                if (href && currentPath.includes(href.toLowerCase()) && href !== '/') {
                     $(this).addClass('active');
                 }
             });
-        });
+        }
+
+        function setupGlobalAjax() {
+            // Show loading overlay for AJAX requests
+            $(document).ajaxStart(function() {
+                showLoading();
+            }).ajaxStop(function() {
+                hideLoading();
+            });
+
+            // Global AJAX error handler
+            $(document).ajaxError(function(event, xhr, settings, thrownError) {
+                hideLoading();
+                if (xhr.status === 403) {
+                    showAdminToast('Lỗi', 'Bạn không có quyền thực hiện thao tác này!', 'error');
+                } else if (xhr.status === 500) {
+                    showAdminToast('Lỗi', 'Có lỗi xảy ra trên server!', 'error');
+                } else if (xhr.status !== 0) { // Ignore aborted requests
+                    showAdminToast('Lỗi', 'Có lỗi xảy ra khi thực hiện yêu cầu!', 'error');
+                }
+            });
+        }
+
+        function showLoading() {
+            $('#loadingOverlay').addClass('show');
+        }
+
+        function hideLoading() {
+            $('#loadingOverlay').removeClass('show');
+        }
+
+        function toggleSidebar() {
+            $('#sidebar').toggleClass('show');
+        }
+
+        function showComingSoon() {
+            showAdminToast('Thông báo', 'Chức năng này đang được phát triển!', 'info');
+        }
+
+        function confirmLogout() {
+            if (confirm('Bạn có chắc chắn muốn đăng xuất không?')) {
+                window.location.href = '/Identity/Account/Logout';
+            }
+        }
+
+        // Global toast function for admin
+        function showAdminToast(title, message, type = 'info') {
+            const toastClass = type === 'success' ? 'bg-success' :
+                              type === 'error' ? 'bg-danger' :
+                              type === 'warning' ? 'bg-warning' : 'bg-info';
+            const icon = type === 'success' ? 'bi-check-circle' :
+                        type === 'error' ? 'bi-exclamation-triangle' :
+                        type === 'warning' ? 'bi-exclamation-triangle' : 'bi-info-circle';
+
+            const toastHtml = `
+                <div class="toast ${toastClass} text-white border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4000">
+                    <div class="toast-header ${toastClass} text-white border-0">
+                        <i class="bi ${icon} me-2"></i>
+                        <strong class="me-auto">${title}</strong>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                </div>
+            `;
+
+            if (!$('#toast-container').length) {
+                $('body').append('<div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3"></div>');
+            }
+
+            const $toast = $(toastHtml);
+            $('#toast-container').append($toast);
+
+            const toast = new bootstrap.Toast($toast[0]);
+            toast.show();
+
+            $toast.on('hidden.bs.toast', function() {
+                $(this).remove();
+            });
+        }
+
+        // Global utility functions
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(amount);
+        }
+
+        function formatNumber(number) {
+            return new Intl.NumberFormat('vi-VN').format(number);
+        }
+
+        function formatDate(date) {
+            return new Date(date).toLocaleDateString('vi-VN');
+        }
+
+        // Export global functions
+        window.showAdminToast = showAdminToast;
+        window.showLoading = showLoading;
+        window.hideLoading = hideLoading;
+        window.formatCurrency = formatCurrency;
+        window.formatNumber = formatNumber;
+        window.formatDate = formatDate;
+
+        // Global error handler
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            console.error('Admin Error: ', {
+                message: msg,
+                url: url,
+                line: lineNo,
+                column: columnNo,
+                error: error
+            });
+            return false;
+        };
     </script>
 
     @RenderSection("Scripts", required: false)
