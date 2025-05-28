@@ -41,9 +41,10 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
-// Đăng ký Repositories
+// Đăng ký Repositories - CẬP NHẬT THÊM ORDER REPOSITORY
 builder.Services.AddScoped<IProductRepository, EFProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, EFCategoryRepository>();
+builder.Services.AddScoped<IOrderRepository, EFOrderRepository>(); // THÊM DÒNG NÀY
 
 var app = builder.Build();
 
