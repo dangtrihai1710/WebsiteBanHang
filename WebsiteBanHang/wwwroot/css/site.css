@@ -123,12 +123,4 @@ footer {
             text-decoration: underline;
         }
 
-/* Đảm bảo flexbox layout hoạt động đúng */
-.min-vh-100 {
-    min-height: 100vh;
-}
 
-/* Thêm khoảng cách cho nội dung chính */
-main {
-    padding-bottom: 2rem;
-}

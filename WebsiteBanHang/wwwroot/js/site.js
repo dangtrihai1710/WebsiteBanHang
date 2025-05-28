@@ -321,6 +321,52 @@ document.addEventListener('DOMContentLoaded', function () {
             }, index * 100);
         });
     });
-
+        // Mobile menu toggle
+    const mobileMenuButton = document.getElementById('mobileMenuButton');
+    const navContainer = document.getElementById('navContainer');
+    
+    if (mobileMenuButton && navContainer) {
+        mobileMenuButton.addEventListener('click', function() {
+            navContainer.classList.toggle('show');
+        });
+    }
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function(event) {
+        if (navContainer && navContainer.classList.contains('show')) {
+            if (!navContainer.contains(event.target) && event.target !== mobileMenuButton) {
+                navContainer.classList.remove('show');
+            }
+        }
+    });
+    
+    // Update cart badge count
+    function updateCartBadge() {
+        const cartBadge = document.getElementById('cartBadge');
+        if (cartBadge) {
+            // Fetch cart count from API or local storage
+            fetch('/ShoppingCart/GetCartCount')
+                .then(response => response.json())
+                .then(data => {
+                    cartBadge.textContent = data.count;
+                    if (data.count > 0) {
+                        cartBadge.style.display = 'flex';
+                    } else {
+                        cartBadge.style.display = 'none';
+                    }
+                })
+                .catch(error => console.error('Error fetching cart count:', error));
+        }
+    }
+    
+    // Initialize
+    updateCartBadge();
+    
+    // Handle window resize
+    window.addEventListener('resize', function() {
+        if (window.innerWidth > 768 && navContainer && navContainer.classList.contains('show')) {
+            navContainer.classList.remove('show');
+        }
+    });
     console.log('🚀 Enhanced website functionality loaded!');
 });
