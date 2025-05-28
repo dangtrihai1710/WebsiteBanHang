@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿<!-- 1. Views/Shared/_Layout.cshtml - Code tổng đã cập nhật -->
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
@@ -15,27 +16,38 @@
             transition: all 0.3s ease;
         }
 
-        .cart-btn:hover {
-            transform: translateY(-2px);
-        }
+            .cart-btn:hover {
+                transform: translateY(-2px);
+            }
 
-        .cart-btn .badge {
-            font-size: 0.7rem;
-            min-width: 1.2rem;
-            height: 1.2rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+            .cart-btn .badge {
+                font-size: 0.7rem;
+                min-width: 1.2rem;
+                height: 1.2rem;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
 
-        .cart-btn:hover .badge {
-            animation: pulse 0.5s;
-        }
+            .cart-btn:hover .badge {
+                animation: pulse 0.5s;
+            }
 
         @@keyframes pulse {
-            0% { transform: scale(1) translate(-50%, -50%); }
-            50% { transform: scale(1.1) translate(-50%, -50%); }
-            100% { transform: scale(1) translate(-50%, -50%); }
+            0%
+
+        {
+            transform: scale(1) translate(-50%, -50%);
+        }
+
+        50% {
+            transform: scale(1.1) translate(-50%, -50%);
+        }
+
+        100% {
+            transform: scale(1) translate(-50%, -50%);
+        }
+
         }
 
         .search-input:focus {
@@ -73,13 +85,16 @@
         }
 
         @@media (max-width: 768px) {
-            .search-input {
-                width: 100%;
-            }
-            
-            .cart-btn {
-                margin-bottom: 10px;
-            }
+            .search-input
+
+        {
+            width: 100%;
+        }
+
+        .cart-btn {
+            margin-bottom: 10px;
+        }
+
         }
     </style>
 </head>
@@ -111,26 +126,17 @@
                             <i class="bi bi-grid me-1"></i>Sản phẩm
                         </a>
                     </li>
+
+                    <!-- Danh mục động từ database -->
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <i class="bi bi-tags me-1"></i>Danh mục
                         </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" asp-controller="Product" asp-action="Category" asp-route-categoryId="1">
-                                <i class="bi bi-laptop me-2"></i>Laptop
-                            </a></li>
-                            <li><a class="dropdown-item" asp-controller="Product" asp-action="Category" asp-route-categoryId="2">
-                                <i class="bi bi-phone me-2"></i>Điện thoại
-                            </a></li>
-                            <li><a class="dropdown-item" asp-controller="Product" asp-action="Category" asp-route-categoryId="3">
-                                <i class="bi bi-headphones me-2"></i>Phụ kiện
-                            </a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" asp-controller="Category" asp-action="Index">
-                                <i class="bi bi-list me-2"></i>Tất cả danh mục
-                            </a></li>
+                        <ul class="dropdown-menu" id="dynamic-categories">
+                            <!-- Categories sẽ được load bằng JavaScript -->
                         </ul>
                     </li>
+
                     <li class="nav-item">
                         <a class="nav-link" href="#contact">
                             <i class="bi bi-envelope me-1"></i>Liên hệ
@@ -139,10 +145,10 @@
                 </ul>
 
                 <!-- Search Bar -->
-                <form class="d-flex me-3" asp-controller="Product" asp-action="Search" method="get">
+                <form class="d-flex me-3" asp-controller="Product" asp-action="Index" method="get">
                     <div class="input-group">
-                        <input class="form-control search-input" type="search" name="searchTerm" 
-                               placeholder="Tìm kiếm sản phẩm..." aria-label="Search">
+                        <input class="form-control search-input" type="search" name="searchTerm"
+                               placeholder="Tìm kiếm sản phẩm..." aria-label="Search" value="@ViewBag.SearchTerm">
                         <button class="btn btn-outline-primary search-btn" type="submit">
                             <i class="bi bi-search"></i>
                         </button>
@@ -152,12 +158,12 @@
                 <!-- Right Side Navigation -->
                 <div class="d-flex align-items-center">
                     <!-- Cart Button -->
-                    <a asp-controller="ShoppingCart" asp-action="Index" 
-                       class="btn btn-outline-dark me-3 cart-btn position-relative" 
+                    <a asp-controller="ShoppingCart" asp-action="Index"
+                       class="btn btn-outline-dark me-3 cart-btn position-relative"
                        title="Giỏ hàng">
                         <i class="bi-cart-fill me-1"></i>
                         Giỏ hàng
-                        <span class="badge bg-danger text-white ms-1 rounded-pill position-absolute top-0 start-100 translate-middle d-none" 
+                        <span class="badge bg-danger text-white ms-1 rounded-pill position-absolute top-0 start-100 translate-middle d-none"
                               id="cart-badge">0</span>
                     </a>
 
@@ -228,34 +234,11 @@
                     </ul>
                 </div>
 
-                <!-- Categories -->
+                <!-- Categories - Động từ database -->
                 <div class="col-lg-2 col-md-6 mb-4">
                     <h6 class="text-uppercase mb-3">Danh mục</h6>
-                    <ul class="list-unstyled">
-                        <li class="mb-2">
-                            <a asp-controller="Product" asp-action="Category" asp-route-categoryId="1" 
-                               class="text-muted text-decoration-none">
-                                <i class="bi bi-chevron-right me-1"></i>Laptop
-                            </a>
-                        </li>
-                        <li class="mb-2">
-                            <a asp-controller="Product" asp-action="Category" asp-route-categoryId="2" 
-                               class="text-muted text-decoration-none">
-                                <i class="bi bi-chevron-right me-1"></i>Điện thoại
-                            </a>
-                        </li>
-                        <li class="mb-2">
-                            <a asp-controller="Product" asp-action="Category" asp-route-categoryId="3" 
-                               class="text-muted text-decoration-none">
-                                <i class="bi bi-chevron-right me-1"></i>Phụ kiện
-                            </a>
-                        </li>
-                        <li class="mb-2">
-                            <a asp-controller="ShoppingCart" asp-action="Index" 
-                               class="text-muted text-decoration-none">
-                                <i class="bi bi-chevron-right me-1"></i>Giỏ hàng
-                            </a>
-                        </li>
+                    <ul class="list-unstyled" id="footer-categories">
+                        <!-- Categories sẽ được load bằng JavaScript -->
                     </ul>
                 </div>
 
@@ -278,7 +261,7 @@
                         <i class="bi bi-clock me-2 text-primary"></i>
                         <span class="text-muted">8:00 - 22:00 (Thứ 2 - Chủ nhật)</span>
                     </div>
-                    
+
                     <!-- Newsletter -->
                     <h6 class="text-uppercase mb-2">Đăng ký nhận tin</h6>
                     <div class="input-group input-group-sm">
@@ -318,7 +301,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script src="~/js/cart.js" asp-append-version="true"></script>
-
+    <script src="~/js/dynamic-categories.js" asp-append-version="true"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

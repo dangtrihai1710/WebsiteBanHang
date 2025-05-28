@@ -1,0 +1,25 @@
+﻿@model IEnumerable<WebsiteBanHang.Models.Category>
+
+<div class="col-lg-2 col-md-6 mb-4">
+    <h6 class="text-uppercase mb-3">Danh mục</h6>
+    <ul class="list-unstyled">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var category in Model)
+            {
+                <li class="mb-2">
+                    <a asp-controller="Product" asp-action="Category" asp-route-categoryId="@category.Id"
+                       class="text-muted text-decoration-none">
+                        <i class="bi bi-chevron-right me-1"></i>@category.Name
+                    </a>
+                </li>
+            }
+        }
+        <li class="mb-2">
+            <a asp-controller="ShoppingCart" asp-action="Index"
+               class="text-muted text-decoration-none">
+                <i class="bi bi-chevron-right me-1"></i>Giỏ hàng
+            </a>
+        </li>
+    </ul>
+</div>
