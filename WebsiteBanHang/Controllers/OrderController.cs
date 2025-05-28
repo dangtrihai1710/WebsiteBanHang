@@ -106,13 +106,7 @@ namespace WebsiteBanHang.Controllers
                 }
 
                 // Kiểm tra trạng thái đơn hàng
-                if (order.OrderStatus != "Đang xử lý")
-                {
-                    return Json(new { success = false, message = "Chỉ có thể hủy đơn hàng đang ở trạng thái 'Đang xử lý'!" });
-                }
 
-                // Cập nhật trạng thái
-                order.OrderStatus = "Đã hủy";
                 await _orderRepository.UpdateAsync(order);
 
                 _logger.LogInformation("User {UserId} cancelled order {OrderId}", user.Id, id);

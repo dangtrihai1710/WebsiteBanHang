@@ -129,12 +129,9 @@ namespace WebsiteBanHang.Repositories
                     throw new ArgumentException("Đơn hàng không tồn tại");
 
                 // Update properties
-                existingOrder.OrderStatus = order.OrderStatus;
+
                 existingOrder.ShippingAddress = order.ShippingAddress;
                 existingOrder.Notes = order.Notes;
-                existingOrder.CustomerName = order.CustomerName;
-                existingOrder.CustomerPhone = order.CustomerPhone;
-                existingOrder.PaymentMethod = order.PaymentMethod;
 
                 await _context.SaveChangesAsync();
             }
@@ -190,7 +187,6 @@ namespace WebsiteBanHang.Repositories
             try
             {
                 return await _context.Orders
-                    .Where(o => o.OrderStatus != "Đã hủy")
                     .SumAsync(o => o.TotalPrice);
             }
             catch (Exception ex)

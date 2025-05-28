@@ -1,210 +1,138 @@
-﻿@model IEnumerable<WebsiteBanHang.Models.Order>
+﻿@model WebsiteBanHang.Models.Order
 @{
-    ViewData["Title"] = "Đơn hàng của tôi";
+    ViewData["Title"] = "Chi tiết đơn hàng #" + Model.Id;
 }
 
 <div class="container py-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2><i class="bi bi-bag-check me-2"></i>Đơn hàng của tôi</h2>
-        <a asp-controller="Home" asp-action="Index" class="btn btn-primary">
-            <i class="bi bi-plus me-2"></i>Tiếp tục mua sắm
-        </a>
-    </div>
-
-    @if (Model?.Any() == true)
-    {
-        <!-- Filter Tabs -->
-        <div class="card mb-4">
-            <div class="card-body">
-                <ul class="nav nav-pills justify-content-center" id="orderTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" data-filter="all">
-                            Tất cả (@Model.Count())
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" data-filter="Đang xử lý">
-                            Đang xử lý (@Model.Count(o => o.OrderStatus == "Đang xử lý"))
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" data-filter="Đang giao">
-                            Đang giao (@Model.Count(o => o.OrderStatus == "Đang giao"))
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" data-filter="Hoàn thành">
-                            Hoàn thành (@Model.Count(o => o.OrderStatus == "Hoàn thành"))
-                        </button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" data-filter="Đã hủy">
-                            Đã hủy (@Model.Count(o => o.OrderStatus == "Đã hủy"))
-                        </button>
-                    </li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Orders List -->
-        <div id="ordersList">
-            @foreach (var order in Model)
-            {
-                <div class="card mb-4 order-item" data-status="@order.OrderStatus">
-                    <div class="card-header">
-                        <div class="row align-items-center">
-                            <div class="col-md-6">
-                                <h6 class="mb-0">
-                                    Đơn hàng #@order.Id
-                                    <span class="badge bg-@(order.OrderStatus switch
-                                        {
-                                            "Hoàn thành" => "success",
-                                            "Đã hủy" => "danger",
-                                            "Đang giao" => "info",
-                                            _ => "warning"
-                                        })">
-                                        @order.OrderStatus
-                                    </span>
-                                </h6>
-                                <small class="text-muted">Đặt ngày @order.OrderDate.ToString("dd/MM/yyyy HH:mm")</small>
-                            </div>
-                            <div class="col-md-6 text-md-end">
-                                <strong class="text-success fs-5">@order.TotalPrice.ToString("#,##0") VNĐ</strong>
-                                <br>
-                                <small class="text-muted">@order.TotalItems sản phẩm</small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <!-- Order Items Preview -->
-                        <div class="row mb-3">
-                            @foreach (var item in order.OrderDetails.Take(3))
-                            {
-                                <div class="col-md-4 mb-2">
-                                    <div class="d-flex align-items-center">
-                                        @if (!string.IsNullOrEmpty(item.Product?.ImageUrl))
-                                        {
-                                            <img src="@item.Product.ImageUrl" alt="@item.Product.Name"
-                                                 class="me-2 rounded" style="width: 40px; height: 40px; object-fit: cover;">
-                                        }
-                                        else
-                                        {
-                                            <div class="bg-light rounded me-2 d-flex align-items-center justify-content-center"
-                                                 style="width: 40px; height: 40px;">
-                                                <i class="bi bi-image text-muted"></i>
-                                            </div>
-                                        }
-                                        <div class="flex-grow-1">
-                                            <small class="fw-bold">@item.Product?.Name</small>
-                                            <br>
-                                            <small class="text-muted">x@item.Quantity</small>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-                            @if (order.OrderDetails.Count > 3)
-                            {
-                                <div class="col-md-4 mb-2">
-                                    <div class="text-center py-2">
-                                        <small class="text-muted">và @(order.OrderDetails.Count - 3) sản phẩm khác...</small>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-
-                        <!-- Order Info -->
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <small class="text-muted">Phương thức thanh toán:</small>
-                                <br>
-                                <span class="fw-bold">
-                                    @switch (order.PaymentMethod)
-                                    {
-                                        case "COD":
-                                            <i class="bi bi-cash text-success me-1"></i>COD
-                                            break;
-                                        case "Banking":
-                                            <i class="bi bi-bank text-primary me-1"></i>Chuyển khoản
-                                            break;
-                                        default:
-                                            <i class="bi bi-wallet2 text-danger me-1"></i>@order.PaymentMethod
-                                            break;
-                                    }
-                                </span>
-                            </div>
-                            <div class="col-md-6">
-                                <small class="text-muted">Địa chỉ giao hàng:</small>
-                                <br>
-                                <span class="fw-bold">@order.ShippingAddress.Truncate(50)</span>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="d-flex flex-wrap gap-2 justify-content-end">
-                            <a asp-action="Details" asp-route-id="@order.Id" class="btn btn-outline-primary btn-sm">
-                                <i class="bi bi-eye me-1"></i>Xem chi tiết
-                            </a>
-
-                            @if (order.OrderStatus == "Đang xử lý")
-                            {
-                                <button class="btn btn-outline-danger btn-sm" onclick="cancelOrder(@order.Id)">
-                                    <i class="bi bi-x-circle me-1"></i>Hủy đơn hàng
-                                </button>
-                            }
-
-                            @if (order.OrderStatus == "Hoàn thành")
-                            {
-                                <button class="btn btn-outline-success btn-sm" onclick="reorder(@order.Id)">
-                                    <i class="bi bi-arrow-repeat me-1"></i>Mua lại
-                                </button>
-                                <button class="btn btn-outline-warning btn-sm">
-                                    <i class="bi bi-star me-1"></i>Đánh giá
-                                </button>
-                            }
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
-    }
-    else
-    {
-        <!-- Empty State -->
-        <div class="text-center py-5">
-            <div class="mb-4">
-                <i class="bi bi-bag-x" style="font-size: 5rem; color: #ddd;"></i>
-            </div>
-            <h4>Bạn chưa có đơn hàng nào</h4>
-            <p class="text-muted mb-4">Hãy bắt đầu mua sắm để tạo đơn hàng đầu tiên của bạn!</p>
-            <a asp-controller="Home" asp-action="Index" class="btn btn-primary btn-lg">
-                <i class="bi bi-plus me-2"></i>Bắt đầu mua sắm
+        <h2><i class="bi bi-receipt me-2"></i>Chi tiết đơn hàng #@Model.Id</h2>
+        <div>
+            <button class="btn btn-secondary" onclick="window.print()">
+                <i class="bi bi-printer me-2"></i>In đơn hàng
+            </button>
+            <a asp-action="Index" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-2"></i>Đơn hàng của tôi
             </a>
         </div>
-    }
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+
+
+            <!-- Order Items -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-bag-check me-2"></i>Sản phẩm đã đặt (@Model.OrderDetails.Count sản phẩm)
+                    </h5>
+                </div>
+                <div class="card-body">
+                    @foreach (var item in Model.OrderDetails)
+                    {
+                        <div class="d-flex justify-content-between align-items-center py-3 @(item != Model.OrderDetails.Last() ? "border-bottom" : "")">
+                            <div class="d-flex align-items-center flex-grow-1">
+                                @if (!string.IsNullOrEmpty(item.Product?.ImageUrl))
+                                {
+                                    <img src="@item.Product.ImageUrl" alt="@item.Product.Name"
+                                         class="me-3 rounded" style="width: 80px; height: 80px; object-fit: cover;">
+                                }
+                                else
+                                {
+                                    <div class="bg-light rounded me-3 d-flex align-items-center justify-content-center"
+                                         style="width: 80px; height: 80px;">
+                                        <i class="bi bi-image text-muted fs-1"></i>
+                                    </div>
+                                }
+                                <div class="flex-grow-1">
+                                    <h6 class="mb-1">@item.Product?.Name</h6>
+                                    <p class="text-muted mb-1">@item.Product?.Category?.Name</p>
+                                    <p class="mb-0">
+                                        <span class="text-success fw-bold">@item.Price.ToString("#,##0") VNĐ</span>
+                                        <span class="text-muted"> × @item.Quantity</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="text-end">
+                                <strong class="text-success fs-5">@item.Total.ToString("#,##0") VNĐ</strong>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Total -->
+                    <div class="d-flex justify-content-between align-items-center pt-3 border-top">
+                        <h5 class="mb-0">Tổng cộng:</h5>
+                        <h4 class="mb-0 text-success">@Model.TotalPrice.ToString("#,##0") VNĐ</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Order Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Thông tin đơn hàng</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-muted small">Mã đơn hàng</label>
+                        <p class="fw-bold mb-0">#@Model.Id</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="text-muted small">Ngày đặt hàng</label>
+                        <p class="fw-bold mb-0">@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Shipping Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-truck me-2"></i>Thông tin giao hàng</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="text-muted small">Địa chỉ giao hàng</label>
+                        <p class="fw-bold mb-0">@Model.ShippingAddress</p>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.Notes))
+                    {
+                        <div class="mb-3">
+                            <label class="text-muted small">Ghi chú</label>
+                            <p class="fw-bold mb-0">@Model.Notes</p>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <!-- Help -->
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-headset me-2"></i>Cần hỗ trợ?</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-3">Liên hệ với chúng tôi nếu bạn có bất kỳ thắc mắc nào về đơn hàng:</p>
+                    <div class="d-grid gap-2">
+                        <a href="tel:19009999" class="btn btn-outline-primary">
+                            <i class="bi bi-telephone me-2"></i>Hotline: 1900 9999
+                        </a>
+                        <a href="mailto:support@shoppro.com" class="btn btn-outline-success">
+                            <i class="bi bi-envelope me-2"></i>Email hỗ trợ
+                        </a>
+                        <button class="btn btn-outline-info">
+                            <i class="bi bi-chat-dots me-2"></i>Chat trực tuyến
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
     <script>
-        $(document).ready(function () {
-            // Filter orders by status
-            $('[data-filter]').click(function () {
-                const filter = $(this).data('filter');
-
-                // Update active tab
-                $('[data-filter]').removeClass('active');
-                $(this).addClass('active');
-
-                // Filter orders
-                if (filter === 'all') {
-                    $('.order-item').show();
-                } else {
-                    $('.order-item').hide();
-                    $(`.order-item[data-status="${filter}"]`).show();
-                }
-            });
-        });
-
-        // Cancel order function
         function cancelOrder(orderId) {
             if (confirm('Bạn có chắc muốn hủy đơn hàng này không?')) {
                 $.ajax({
@@ -214,7 +142,7 @@
                     headers: {
                         'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
                     },
-                    success: function (response) {
+                    success: function(response) {
                         if (response.success) {
                             showToast('Thành công!', response.message, 'success');
                             setTimeout(() => location.reload(), 1000);
@@ -222,14 +150,13 @@
                             showToast('Lỗi!', response.message, 'error');
                         }
                     },
-                    error: function () {
+                    error: function() {
                         showToast('Lỗi!', 'Không thể hủy đơn hàng', 'error');
                     }
                 });
             }
         }
 
-        // Reorder function
         function reorder(orderId) {
             if (confirm('Bạn có muốn thêm tất cả sản phẩm trong đơn hàng này vào giỏ hàng không?')) {
                 $.ajax({
@@ -239,7 +166,7 @@
                     headers: {
                         'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
                     },
-                    success: function (response) {
+                    success: function(response) {
                         if (response.success) {
                             showToast('Thành công!', response.message, 'success');
                             if (response.redirect) {
@@ -249,14 +176,13 @@
                             showToast('Lỗi!', response.message, 'error');
                         }
                     },
-                    error: function () {
+                    error: function() {
                         showToast('Lỗi!', 'Không thể mua lại đơn hàng', 'error');
                     }
                 });
             }
         }
 
-        // Toast notification
         function showToast(title, message, type) {
             const toastClass = type === 'success' ? 'bg-success' : 'bg-danger';
             const icon = type === 'success' ? 'bi-check-circle' : 'bi-exclamation-triangle';
@@ -282,7 +208,7 @@
             const toast = new bootstrap.Toast($toast[0], { autohide: true, delay: 3000 });
             toast.show();
 
-            $toast.on('hidden.bs.toast', function () {
+            $toast.on('hidden.bs.toast', function() {
                 $(this).remove();
             });
         }

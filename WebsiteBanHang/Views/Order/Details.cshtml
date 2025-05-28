@@ -19,54 +19,8 @@
 
     <div class="row">
         <div class="col-lg-8">
-            <!-- Order Status -->
-            <div class="card mb-4">
-                <div class="card-header bg-@(Model.OrderStatus == "Hoàn thành" ? "success" : 
-                                          Model.OrderStatus == "Đã hủy" ? "danger" : 
-                                          Model.OrderStatus == "Đang giao" ? "info" : "warning") text-white">
-                    <h5 class="mb-0">
-                        <i class="bi bi-@(Model.OrderStatus == "Hoàn thành" ? "check-circle" : 
-                                         Model.OrderStatus == "Đã hủy" ? "x-circle" : 
-                                         Model.OrderStatus == "Đang giao" ? "truck" : "clock") me-2"></i>
-                        Trạng thái: @Model.OrderStatus
-                    </h5>
-                </div>
-                <div class="card-body">
-                    @if (Model.OrderStatus == "Đang xử lý")
-                    {
-                        <p class="mb-2"><i class="bi bi-info-circle text-info me-2"></i>Đơn hàng của bạn đang được xử lý. Chúng tôi sẽ sớm xác nhận và giao hàng.</p>
-                        <button class="btn btn-danger btn-sm" onclick="cancelOrder(@Model.Id)">
-                            <i class="bi bi-x-circle me-2"></i>Hủy đơn hàng
-                        </button>
-                    }
-                    else if (Model.OrderStatus == "Đã xác nhận")
-                    {
-                        <p class="mb-0"><i class="bi bi-check-circle text-success me-2"></i>Đơn hàng đã được xác nhận và đang chuẩn bị giao hàng.</p>
-                    }
-                    else if (Model.OrderStatus == "Đang giao")
-                    {
-                        <p class="mb-2"><i class="bi bi-truck text-info me-2"></i>Đơn hàng đang được giao đến bạn. Vui lòng chuẩn bị nhận hàng.</p>
-                        <p class="mb-0"><strong>Mã vận đơn:</strong> <span class="text-primary">#GHN@Model.Id.ToString().PadLeft(8, '0')</span></p>
-                    }
-                    else if (Model.OrderStatus == "Hoàn thành")
-                    {
-                        <p class="mb-2"><i class="bi bi-check-circle text-success me-2"></i>Đơn hàng đã được giao thành công. Cảm ơn bạn đã mua hàng!</p>
-                        <button class="btn btn-success btn-sm me-2" onclick="reorder(@Model.Id)">
-                            <i class="bi bi-arrow-repeat me-2"></i>Mua lại
-                        </button>
-                        <button class="btn btn-warning btn-sm">
-                            <i class="bi bi-star me-2"></i>Đánh giá sản phẩm
-                        </button>
-                    }
-                    else if (Model.OrderStatus == "Đã hủy")
-                    {
-                        <p class="mb-2"><i class="bi bi-x-circle text-danger me-2"></i>Đơn hàng đã bị hủy.</p>
-                        <button class="btn btn-primary btn-sm" onclick="reorder(@Model.Id)">
-                            <i class="bi bi-arrow-repeat me-2"></i>Đặt lại đơn hàng
-                        </button>
-                    }
-                </div>
-            </div>
+
+
 
             <!-- Order Items -->
             <div class="card mb-4">
@@ -133,20 +87,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="text-muted small">Phương thức thanh toán</label>
-                        <p class="fw-bold mb-0">
-                            @if (Model.PaymentMethod == "COD")
-                            {
-                                <i class="bi bi-cash text-success me-1"></i>Thanh toán khi nhận hàng
-                            }
-                            else if (Model.PaymentMethod == "Banking")
-                            {
-                                <i class="bi bi-bank text-primary me-1"></i>Chuyển khoản ngân hàng
-                            }
-                            else
-                            {
-                                <i class="bi bi-wallet2 text-danger me-1"></i>@Model.PaymentMethod
-                            }
-                        </p>
+                        <p class="fw-bold mb-0">                    </p>
                     </div>
                 </div>
             </div>
@@ -157,14 +98,6 @@
                     <h5 class="mb-0"><i class="bi bi-truck me-2"></i>Thông tin giao hàng</h5>
                 </div>
                 <div class="card-body">
-                    <div class="mb-3">
-                        <label class="text-muted small">Người nhận</label>
-                        <p class="fw-bold mb-0">@Model.CustomerName</p>
-                    </div>
-                    <div class="mb-3">
-                        <label class="text-muted small">Số điện thoại</label>
-                        <p class="fw-bold mb-0">@Model.CustomerPhone</p>
-                    </div>
                     <div class="mb-3">
                         <label class="text-muted small">Địa chỉ giao hàng</label>
                         <p class="fw-bold mb-0">@Model.ShippingAddress</p>

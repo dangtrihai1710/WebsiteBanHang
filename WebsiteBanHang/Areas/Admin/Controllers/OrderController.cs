@@ -57,30 +57,7 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
             }
         }
 
-        // Cập nhật trạng thái đơn hàng
-        [HttpPost]
-        public async Task<IActionResult> UpdateStatus(int id, string status)
-        {
-            try
-            {
-                var order = await _orderRepository.GetByIdAsync(id);
-                if (order == null)
-                {
-                    return Json(new { success = false, message = "Không tìm thấy đơn hàng!" });
-                }
 
-                order.OrderStatus = status;
-                await _orderRepository.UpdateAsync(order);
-
-                _logger.LogInformation("Order {OrderId} status updated to {Status}", id, status);
-                return Json(new { success = true, message = "Cập nhật trạng thái thành công!" });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error updating order status for ID: {OrderId}", id);
-                return Json(new { success = false, message = "Lỗi khi cập nhật trạng thái: " + ex.Message });
-            }
-        }
 
         // Xóa đơn hàng
         public async Task<IActionResult> Delete(int id)

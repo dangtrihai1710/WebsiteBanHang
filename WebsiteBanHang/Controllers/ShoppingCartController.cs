@@ -145,7 +145,6 @@ namespace WebsiteBanHang.Controllers
                 var user = _userManager.GetUserAsync(User).Result;
                 if (user != null)
                 {
-                    model.Order.CustomerName = user.FullName;
                     model.Order.ShippingAddress = user.Address ?? "";
                     ViewBag.UserFullName = user.FullName;
                 }
@@ -190,10 +189,6 @@ namespace WebsiteBanHang.Controllers
                         TotalPrice = cart.GetTotalPrice(),
                         ShippingAddress = model.Order.ShippingAddress,
                         Notes = model.Order.Notes,
-                        CustomerName = model.Order.CustomerName,
-                        CustomerPhone = model.Order.CustomerPhone,
-                        PaymentMethod = model.Order.PaymentMethod,
-                        OrderStatus = "Đang xử lý"
                     };
 
                     // Tạo chi tiết đơn hàng

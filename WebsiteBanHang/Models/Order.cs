@@ -25,17 +25,7 @@ namespace WebsiteBanHang.Models
         [StringLength(1000, ErrorMessage = "Ghi chú không được quá 1000 ký tự")]
         public string? Notes { get; set; }
 
-        public OrderStatus OrderStatus { get; set; } = OrderStatus.DangXuLy;
 
-        [Required]
-        [StringLength(100)]
-        public string CustomerName { get; set; } = string.Empty;
-
-        [Required]
-        [StringLength(20)]
-        public string CustomerPhone { get; set; } = string.Empty;
-
-        public string PaymentMethod { get; set; } = "COD";
 
         // Navigation properties
         [ForeignKey("UserId")]

@@ -39,35 +39,6 @@
                         <p class="fs-4 fw-bold text-success">@Model.TotalPrice.ToString("#,##0") VNĐ</p>
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label text-muted">Trạng thái đơn hàng</label>
-                        <div>
-                            <select class="form-select" id="orderStatus" data-order-id="@Model.Id">
-                                <option value="Đang xử lý" selected="@(Model.OrderStatus == "Đang xử lý")">Đang xử lý</option>
-                                <option value="Đã xác nhận" selected="@(Model.OrderStatus == "Đã xác nhận")">Đã xác nhận</option>
-                                <option value="Đang giao" selected="@(Model.OrderStatus == "Đang giao")">Đang giao</option>
-                                <option value="Hoàn thành" selected="@(Model.OrderStatus == "Hoàn thành")">Hoàn thành</option>
-                                <option value="Đã hủy" selected="@(Model.OrderStatus == "Đã hủy")">Đã hủy</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label text-muted">Phương thức thanh toán</label>
-                        <p class="fw-bold">
-                            @if (Model.PaymentMethod == "COD")
-                            {
-                                <i class="bi bi-cash text-success me-2"></i><span>Thanh toán khi nhận hàng</span>
-                            }
-                            else if (Model.PaymentMethod == "Banking")
-                            {
-                                <i class="bi bi-bank text-primary me-2"></i><span>Chuyển khoản ngân hàng</span>
-                            }
-                            else
-                            {
-                                <i class="bi bi-wallet2 text-danger me-2"></i><span>@Model.PaymentMethod</span>
-                            }
-                        </p>
-                    </div>
-                    <div class="col-md-6 mb-3">
                         <label class="form-label text-muted">Tổng số sản phẩm</label>
                         <p class="fw-bold">@Model.TotalItems sản phẩm</p>
                     </div>
@@ -84,14 +55,6 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label text-muted">Họ và tên</label>
-                        <p class="fw-bold">@Model.CustomerName</p>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label text-muted">Số điện thoại</label>
-                        <p class="fw-bold">@Model.CustomerPhone</p>
-                    </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label text-muted">Email</label>
                         <p class="fw-bold">@(Model.ApplicationUser?.Email ?? "N/A")</p>
@@ -191,63 +154,6 @@
     </div>
 
     <div class="col-lg-4">
-        <!-- Trạng thái đơn hàng -->
-        <div class="card card-admin mb-4">
-            <div class="card-header">
-                <h5 class="card-title mb-0 text-primary">
-                    <i class="bi bi-clipboard-check me-2"></i>Trạng thái đơn hàng
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="timeline">
-                    @{
-                        var statusList = new[] {"Đang xử lý", "Đã xác nhận", "Đang giao", "Hoàn thành"};
-                        var currentStatusIndex = Array.IndexOf(statusList, Model.OrderStatus);
-                    }
-                    
-                    <div class="timeline-item completed">
-                        <div class="timeline-marker bg-success">
-                            <i class="bi bi-check text-white"></i>
-                        </div>
-                        <div class="timeline-content">
-                            <h6>Đơn hàng đã được tạo</h6>
-                            <small class="text-muted">@Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</small>
-                        </div>
-                    </div>
-                    
-                    <div class="timeline-item @(currentStatusIndex >= 0 ? "completed" : currentStatusIndex == -1 && Model.OrderStatus == "Đang xử lý" ? "current" : "")">
-                        <div class="timeline-marker @(currentStatusIndex >= 0 ? "bg-success" : "bg-warning")">
-                            <i class="bi bi-@(currentStatusIndex >= 0 ? "check" : "clock") text-white"></i>
-                        </div>
-                        <div class="timeline-content">
-                            <h6>Xác nhận đơn hàng</h6>
-                            <small class="text-muted">Chờ xác nhận</small>
-                        </div>
-                    </div>
-                    
-                    <div class="timeline-item @(currentStatusIndex >= 2 ? "completed" : currentStatusIndex == 1 ? "current" : "")">
-                        <div class="timeline-marker @(currentStatusIndex >= 2 ? "bg-success" : currentStatusIndex == 1 ? "bg-warning" : "bg-secondary")">
-                            <i class="bi bi-@(currentStatusIndex >= 2 ? "check" : "truck") text-white"></i>
-                        </div>
-                        <div class="timeline-content">
-                            <h6>Đang giao hàng</h6>
-                            <small class="text-muted">Đang vận chuyển</small>
-                        </div>
-                    </div>
-                    
-                    <div class="timeline-item @(currentStatusIndex >= 3 ? "completed" : currentStatusIndex == 2 ? "current" : "")">
-                        <div class="timeline-marker @(currentStatusIndex >= 3 ? "bg-success" : currentStatusIndex == 2 ? "bg-warning" : "bg-secondary")">
-                            <i class="bi bi-@(currentStatusIndex >= 3 ? "check" : "house") text-white"></i>
-                        </div>
-                        <div class="timeline-content">
-                            <h6>Giao hàng thành công</h6>
-                            <small class="text-muted">@(Model.OrderStatus == "Hoàn thành" ? "Đã hoàn thành" : "Chưa hoàn thành")</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Thao tác nhanh -->
         <div class="card card-admin mb-4">
             <div class="card-header">
@@ -266,9 +172,6 @@
                     <a href="mailto:@(Model.ApplicationUser?.Email ?? "")" class="btn btn-success">
                         <i class="bi bi-envelope me-2"></i>Gửi email
                     </a>
-                    <a href="tel:@Model.CustomerPhone" class="btn btn-warning">
-                        <i class="bi bi-telephone me-2"></i>Gọi điện thoại
-                    </a>
                     <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger" 
                        onclick="return confirm('Bạn có chắc muốn xóa đơn hàng này?')">
                         <i class="bi bi-trash me-2"></i>Xóa đơn hàng
@@ -276,82 +179,8 @@
                 </div>
             </div>
         </div>
-
-        <!-- Thông tin bổ sung -->
-        <div class="card card-admin">
-            <div class="card-header">
-                <h5 class="card-title mb-0">
-                    <i class="bi bi-info-circle me-2"></i>Thông tin bổ sung
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="mb-2">
-                    <strong>Phí vận chuyển:</strong>
-                    <span class="text-success">Miễn phí</span>
-                </div>
-                <div class="mb-2">
-                    <strong>Thời gian giao hàng dự kiến:</strong>
-                    <span>1-3 ngày làm việc</span>
-                </div>
-                <div class="mb-2">
-                    <strong>Đơn vị vận chuyển:</strong>
-                    <span>Giao hàng tiết kiệm</span>
-                </div>
-                <div class="mb-2">
-                    <strong>Mã vận đơn:</strong>
-                    <span class="text-primary">#GHN@Model.Id.ToString().PadLeft(8, '0')</span>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
-
-<style>
-    .timeline {
-        position: relative;
-        padding-left: 30px;
-    }
-
-    .timeline-item {
-        position: relative;
-        margin-bottom: 20px;
-    }
-
-    .timeline-marker {
-        position: absolute;
-        left: -40px;
-        top: 0;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .timeline::before {
-        content: '';
-        position: absolute;
-        left: -25px;
-        top: 15px;
-        bottom: 0;
-        width: 2px;
-        background-color: #dee2e6;
-    }
-
-    .timeline-item.completed .timeline-marker {
-        background-color: #198754 !important;
-    }
-
-    .timeline-item.current .timeline-marker {
-        background-color: #ffc107 !important;
-    }
-
-    @@media print {
-        .btn, .card-header { display: none !important; }
-        .card { border: none !important; box-shadow: none !important; }
-    }
-</style>
 
 @section Scripts {
     <script>
@@ -413,5 +242,4 @@
                 $(this).remove();
             });
         }
-    </script>
-}
+    </script>}
