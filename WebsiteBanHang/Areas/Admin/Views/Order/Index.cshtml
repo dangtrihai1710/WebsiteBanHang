@@ -1,5 +1,5 @@
-﻿<!-- Areas/Admin/Views/Order/Index.cshtml -->
-@model IEnumerable<WebsiteBanHang.Models.Order>
+﻿@model IEnumerable<WebsiteBanHang.Models.Order>
+@using WebsiteBanHang.Models
 @{
     ViewData["Title"] = "Quản lý đơn hàng";
 }
@@ -110,7 +110,7 @@
                                         <br>
                                         <small class="text-muted">@order.CustomerPhone</small>
                                         <br>
-                                        <small class="text-muted">@order.ApplicationUser?.Email</small>
+                                        <small class="text-muted">@(order.ApplicationUser?.Email ?? "N/A")</small>
                                     </div>
                                 </td>
                                 <td>
@@ -126,12 +126,12 @@
                                     <small class="text-muted">@order.TotalItems sản phẩm</small>
                                 </td>
                                 <td>
-                                    <select class="form-select form-select-sm status-select" data-order-id="@order.Id">
-                                        <option value="Đang xử lý" @(order.OrderStatus == "Đang xử lý" ? "selected" : "")>Đang xử lý</option>
-                                        <option value="Đã xác nhận" @(order.OrderStatus == "Đã xác nhận" ? "selected" : "")>Đã xác nhận</option>
-                                        <option value="Đang giao" @(order.OrderStatus == "Đang giao" ? "selected" : "")>Đang giao</option>
-                                        <option value="Hoàn thành" @(order.OrderStatus == "Hoàn thành" ? "selected" : "")>Hoàn thành</option>
-                                        <option value="Đã hủy" @(order.OrderStatus == "Đã hủy" ? "selected" : "")>Đã hủy</option>
+                                    <select class="form-select" id="orderStatus" data-order-id="@Model.Id">
+                                        <option value="Đang xử lý" selected="@(Model.OrderStatus == "Đang xử lý")">Đang xử lý</option>
+                                        <option value="Đã xác nhận" selected="@(Model.OrderStatus == "Đã xác nhận")">Đã xác nhận</option>
+                                        <option value="Đang giao" selected="@(Model.OrderStatus == "Đang giao")">Đang giao</option>
+                                        <option value="Hoàn thành" selected="@(Model.OrderStatus == "Hoàn thành")">Hoàn thành</option>
+                                        <option value="Đã hủy" selected="@(Model.OrderStatus == "Đã hủy")">Đã hủy</option>
                                     </select>
                                 </td>
                                 <td>
@@ -158,114 +158,3 @@
                 <p class="text-muted">Các đơn hàng mới sẽ hiển thị tại đây</p>
             </div>
         }
-    </div>
-</div>
-
-@section Scripts {
-    <script>
-        $(document).ready(function() {
-            // Initialize DataTable
-            $('#orderTable').DataTable({
-                "language": {
-                    "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Vietnamese.json"
-                },
-                "responsive": true,
-                "pageLength": 10,
-                "order": [[0, "desc"]]
-            });
-
-            // Handle status change
-            $('.status-select').change(function() {
-                const orderId = $(this).data('order-id');
-                const newStatus = $(this).val();
-                
-                $.ajax({
-                    url: '@Url.Action("UpdateStatus")',
-                    type: 'POST',
-                    data: {
-                        id: orderId,
-                        status: newStatus
-                    },
-                    success: function(response) {
-                        if (response.success) {
-                            showToast('Thành công!', response.message, 'success');
-                            // Update row status attribute
-                            $(`tr:has([data-order-id="${orderId}"])`).attr('data-status', newStatus);
-                        } else {
-                            showToast('Lỗi!', response.message, 'error');
-                        }
-                    },
-                    error: function() {
-                        showToast('Lỗi!', 'Không thể cập nhật trạng thái', 'error');
-                    }
-                });
-            });
-        });
-
-        // Filter orders by status
-        function filterOrders(status) {
-            const table = $('#orderTable').DataTable();
-            
-            if (status === 'all') {
-                table.search('').draw();
-            } else {
-                table.search(status).draw();
-            }
-
-            // Update active button
-            $('.btn-group button').removeClass('active');
-            event.target.classList.add('active');
-        }
-
-        // Load order statistics
-        function loadOrderStats() {
-            $.get('@Url.Action("GetOrderStats")', function(response) {
-                if (response.success) {
-                    $('#totalOrders').text(response.totalOrders);
-                    $('#totalRevenue').text(formatPrice(response.totalRevenue) + ' VNĐ');
-                    $('#statsCards').fadeIn();
-                }
-            });
-        }
-
-        // Format price
-        function formatPrice(price) {
-            return new Intl.NumberFormat('vi-VN').format(price);
-        }
-
-        // Toast notification
-        function showToast(title, message, type) {
-            const toastClass = type === 'success' ? 'bg-success' : 'bg-danger';
-            const icon = type === 'success' ? 'bi-check-circle' : 'bi-exclamation-triangle';
-            
-            const toastHtml = `
-                <div class="toast ${toastClass} text-white" role="alert">
-                    <div class="toast-header ${toastClass} text-white border-0">
-                        <i class="bi ${icon} me-2"></i>
-                        <strong class="me-auto">${title}</strong>
-                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
-                    </div>
-                    <div class="toast-body">${message}</div>
-                </div>
-            `;
-            
-            if (!$('#toast-container').length) {
-                $('body').append('<div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3"></div>');
-            }
-            
-            const $toast = $(toastHtml);
-            $('#toast-container').append($toast);
-            
-            const toast = new bootstrap.Toast($toast[0]);
-            toast.show();
-            
-            $toast.on('hidden.bs.toast', function() {
-                $(this).remove();
-            });
-        }
-    </script>
-    
-    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script>
-}

@@ -1,5 +1,4 @@
-﻿<!-- Areas/Admin/Views/Order/Details.cshtml -->
-@model WebsiteBanHang.Models.Order
+﻿@model WebsiteBanHang.Models.Order
 @{
     ViewData["Title"] = "Chi tiết đơn hàng #" + Model.Id;
 }
@@ -43,11 +42,11 @@
                         <label class="form-label text-muted">Trạng thái đơn hàng</label>
                         <div>
                             <select class="form-select" id="orderStatus" data-order-id="@Model.Id">
-                                <option value="Đang xử lý" @(Model.OrderStatus == "Đang xử lý" ? "selected" : "")>Đang xử lý</option>
-                                <option value="Đã xác nhận" @(Model.OrderStatus == "Đã xác nhận" ? "selected" : "")>Đã xác nhận</option>
-                                <option value="Đang giao" @(Model.OrderStatus == "Đang giao" ? "selected" : "")>Đang giao</option>
-                                <option value="Hoàn thành" @(Model.OrderStatus == "Hoàn thành" ? "selected" : "")>Hoàn thành</option>
-                                <option value="Đã hủy" @(Model.OrderStatus == "Đã hủy" ? "selected" : "")>Đã hủy</option>
+                                <option value="Đang xử lý" selected="@(Model.OrderStatus == "Đang xử lý")">Đang xử lý</option>
+                                <option value="Đã xác nhận" selected="@(Model.OrderStatus == "Đã xác nhận")">Đã xác nhận</option>
+                                <option value="Đang giao" selected="@(Model.OrderStatus == "Đang giao")">Đang giao</option>
+                                <option value="Hoàn thành" selected="@(Model.OrderStatus == "Hoàn thành")">Hoàn thành</option>
+                                <option value="Đã hủy" selected="@(Model.OrderStatus == "Đã hủy")">Đã hủy</option>
                             </select>
                         </div>
                     </div>
@@ -56,15 +55,15 @@
                         <p class="fw-bold">
                             @if (Model.PaymentMethod == "COD")
                             {
-                                <i class="bi bi-cash text-success me-2"></i>Thanh toán khi nhận hàng
+                                <i class="bi bi-cash text-success me-2"></i><span>Thanh toán khi nhận hàng</span>
                             }
                             else if (Model.PaymentMethod == "Banking")
                             {
-                                <i class="bi bi-bank text-primary me-2"></i>Chuyển khoản ngân hàng
+                                <i class="bi bi-bank text-primary me-2"></i><span>Chuyển khoản ngân hàng</span>
                             }
                             else
                             {
-                                <i class="bi bi-wallet2 text-danger me-2"></i>@Model.PaymentMethod
+                                <i class="bi bi-wallet2 text-danger me-2"></i><span>@Model.PaymentMethod</span>
                             }
                         </p>
                     </div>
@@ -95,11 +94,11 @@
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label text-muted">Email</label>
-                        <p class="fw-bold">@Model.ApplicationUser?.Email</p>
+                        <p class="fw-bold">@(Model.ApplicationUser?.Email ?? "N/A")</p>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label text-muted">Tài khoản</label>
-                        <p class="fw-bold">@Model.ApplicationUser?.FullName</p>
+                        <p class="fw-bold">@(Model.ApplicationUser?.FullName ?? "N/A")</p>
                     </div>
                 </div>
                 <div class="mb-3">
@@ -158,14 +157,14 @@
                                                 </div>
                                             }
                                             <div>
-                                                <strong>@item.Product?.Name</strong>
+                                                <strong>@(item.Product?.Name ?? "N/A")</strong>
                                                 <br>
                                                 <small class="text-muted">ID: #@item.ProductId</small>
                                             </div>
                                         </div>
                                     </td>
                                     <td>
-                                        <span class="badge bg-info">@item.Product?.Category?.Name</span>
+                                        <span class="badge bg-info">@(item.Product?.Category?.Name ?? "N/A")</span>
                                     </td>
                                     <td>
                                         <strong>@item.Price.ToString("#,##0") VNĐ</strong>
@@ -201,7 +200,12 @@
             </div>
             <div class="card-body">
                 <div class="timeline">
-                    <div class="timeline-item @(new[] {"Đang xử lý", "Đã xác nhận", "Đang giao", "Hoàn thành"}.Contains(Model.OrderStatus) ? "completed" : "")">
+                    @{
+                        var statusList = new[] {"Đang xử lý", "Đã xác nhận", "Đang giao", "Hoàn thành"};
+                        var currentStatusIndex = Array.IndexOf(statusList, Model.OrderStatus);
+                    }
+                    
+                    <div class="timeline-item completed">
                         <div class="timeline-marker bg-success">
                             <i class="bi bi-check text-white"></i>
                         </div>
@@ -211,9 +215,9 @@
                         </div>
                     </div>
                     
-                    <div class="timeline-item @(new[] {"Đã xác nhận", "Đang giao", "Hoàn thành"}.Contains(Model.OrderStatus) ? "completed" : Model.OrderStatus == "Đang xử lý" ? "current" : "")">
-                        <div class="timeline-marker @(new[] {"Đã xác nhận", "Đang giao", "Hoàn thành"}.Contains(Model.OrderStatus) ? "bg-success" : Model.OrderStatus == "Đang xử lý" ? "bg-warning" : "bg-secondary")">
-                            <i class="bi bi-@(new[] {"Đã xác nhận", "Đang giao", "Hoàn thành"}.Contains(Model.OrderStatus) ? "check" : "clock") text-white"></i>
+                    <div class="timeline-item @(currentStatusIndex >= 0 ? "completed" : currentStatusIndex == -1 && Model.OrderStatus == "Đang xử lý" ? "current" : "")">
+                        <div class="timeline-marker @(currentStatusIndex >= 0 ? "bg-success" : "bg-warning")">
+                            <i class="bi bi-@(currentStatusIndex >= 0 ? "check" : "clock") text-white"></i>
                         </div>
                         <div class="timeline-content">
                             <h6>Xác nhận đơn hàng</h6>
@@ -221,9 +225,9 @@
                         </div>
                     </div>
                     
-                    <div class="timeline-item @(new[] {"Đang giao", "Hoàn thành"}.Contains(Model.OrderStatus) ? "completed" : Model.OrderStatus == "Đã xác nhận" ? "current" : "")">
-                        <div class="timeline-marker @(new[] {"Đang giao", "Hoàn thành"}.Contains(Model.OrderStatus) ? "bg-success" : Model.OrderStatus == "Đã xác nhận" ? "bg-warning" : "bg-secondary")">
-                            <i class="bi bi-@(new[] {"Đang giao", "Hoàn thành"}.Contains(Model.OrderStatus) ? "check" : "truck") text-white"></i>
+                    <div class="timeline-item @(currentStatusIndex >= 2 ? "completed" : currentStatusIndex == 1 ? "current" : "")">
+                        <div class="timeline-marker @(currentStatusIndex >= 2 ? "bg-success" : currentStatusIndex == 1 ? "bg-warning" : "bg-secondary")">
+                            <i class="bi bi-@(currentStatusIndex >= 2 ? "check" : "truck") text-white"></i>
                         </div>
                         <div class="timeline-content">
                             <h6>Đang giao hàng</h6>
@@ -231,9 +235,9 @@
                         </div>
                     </div>
                     
-                    <div class="timeline-item @(Model.OrderStatus == "Hoàn thành" ? "completed" : Model.OrderStatus == "Đang giao" ? "current" : "")">
-                        <div class="timeline-marker @(Model.OrderStatus == "Hoàn thành" ? "bg-success" : Model.OrderStatus == "Đang giao" ? "bg-warning" : "bg-secondary")">
-                            <i class="bi bi-@(Model.OrderStatus == "Hoàn thành" ? "check" : "house") text-white"></i>
+                    <div class="timeline-item @(currentStatusIndex >= 3 ? "completed" : currentStatusIndex == 2 ? "current" : "")">
+                        <div class="timeline-marker @(currentStatusIndex >= 3 ? "bg-success" : currentStatusIndex == 2 ? "bg-warning" : "bg-secondary")">
+                            <i class="bi bi-@(currentStatusIndex >= 3 ? "check" : "house") text-white"></i>
                         </div>
                         <div class="timeline-content">
                             <h6>Giao hàng thành công</h6>
@@ -259,7 +263,7 @@
                     <button class="btn btn-info" onclick="sendNotification()">
                         <i class="bi bi-bell me-2"></i>Gửi thông báo
                     </button>
-                    <a href="mailto:@Model.ApplicationUser?.Email" class="btn btn-success">
+                    <a href="mailto:@(Model.ApplicationUser?.Email ?? "")" class="btn btn-success">
                         <i class="bi bi-envelope me-2"></i>Gửi email
                     </a>
                     <a href="tel:@Model.CustomerPhone" class="btn btn-warning">
@@ -343,7 +347,7 @@
         background-color: #ffc107 !important;
     }
 
-    @media print {
+    @@media print {
         .btn, .card-header { display: none !important; }
         .card { border: none !important; box-shadow: none !important; }
     }
@@ -377,7 +381,6 @@
         }
 
         function sendNotification() {
-            // Simulate sending notification
             showToast('Thông báo!', 'Đã gửi thông báo cập nhật đơn hàng đến khách hàng', 'success');
         }
 
