@@ -30,10 +30,14 @@
                         <div class="col-md-6 mb-3">
                             <label asp-for="Price" class="form-label">Giá <span class="text-danger">*</span></label>
                             <div class="input-group">
-                                <input asp-for="Price" class="form-control" placeholder="0" />
+                                <input asp-for="Price" class="form-control" placeholder="Ví dụ: 120000" type="number" min="0" step="1" />
                                 <span class="input-group-text">VNĐ</span>
                             </div>
                             <span asp-validation-for="Price" class="text-danger"></span>
+                            <div class="form-text">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Nhập số nguyên, ví dụ: 120000 cho 120,000 VNĐ
+                            </div>
                         </div>
                     </div>
 
@@ -87,7 +91,21 @@
 
         <div class="card card-admin mt-3">
             <div class="card-header">
-                <h5 class="card-title mb-0"><i class="bi bi-lightbulb me-2"></i>Gợi ý</h5>
+                <h5 class="card-title mb-0"><i class="bi bi-lightbulb me-2"></i>Hướng dẫn nhập giá</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-unstyled mb-0">
+                    <li><i class="bi bi-check text-success me-2"></i>Nhập số nguyên không có dấu phẩy</li>
+                    <li><i class="bi bi-check text-success me-2"></i>Ví dụ: <code>120000</code> = 120,000 VNĐ</li>
+                    <li><i class="bi bi-check text-success me-2"></i>Ví dụ: <code>2500000</code> = 2,500,000 VNĐ</li>
+                    <li><i class="bi bi-info text-primary me-2"></i>Hệ thống sẽ tự động định dạng khi hiển thị</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card card-admin mt-3">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="bi bi-lightbulb me-2"></i>Gợi ý khác</h5>
             </div>
             <div class="card-body">
                 <ul class="list-unstyled mb-0">
@@ -106,6 +124,7 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
+        // Chỉ xử lý image preview - bỏ hết logic format giá phức tạp
         document.getElementById('imageInput').addEventListener('change', function (event) {
             const file = event.target.files[0];
             const preview = document.getElementById('imagePreview');
@@ -122,14 +141,6 @@
                         <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
                     </div>
                 `;
-            }
-        });
-
-        // Format price input
-        document.querySelector('input[name="Price"]').addEventListener('input', function(e) {
-            let value = e.target.value.replace(/[^\d]/g, '');
-            if (value) {
-                e.target.value = parseInt(value).toLocaleString('vi-VN');
             }
         });
     </script>
