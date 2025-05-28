@@ -168,10 +168,13 @@
                                            class="btn btn-primary btn-sm">
                                             <i class="bi bi-eye"></i>
                                         </a>
-                                        <button class="btn btn-success btn-sm btn-add-cart" data-product-id="@item.Id">
+                                        <button class="btn btn-success btn-sm btn-add-cart-quick" 
+                                                data-product-id="@item.Id" 
+                                                data-product-name="@item.Name"
+                                                title="Thêm vào giỏ hàng">
                                             <i class="bi bi-cart-plus"></i>
                                         </button>
-                                        <button class="btn btn-outline-primary btn-sm">
+                                        <button class="btn btn-outline-primary btn-sm btn-wishlist" title="Yêu thích">
                                             <i class="bi bi-heart"></i>
                                         </button>
                                     </div>
@@ -181,7 +184,11 @@
                             <!-- Product Info -->
                             <div class="product-info">
                                 <div class="product-category">@(item.Category?.Name ?? "Chưa phân loại")</div>
-                                <h5 class="product-title">@item.Name</h5>
+                                <h5 class="product-title">
+                                    <a href="@Url.Action("Display", "Product", new { id = item.Id })" class="text-decoration-none text-dark">
+                                        @item.Name
+                                    </a>
+                                </h5>
                                 <div class="product-rating mb-2">
                                     <i class="bi bi-star-fill text-warning"></i>
                                     <i class="bi bi-star-fill text-warning"></i>
@@ -198,7 +205,9 @@
                             
                             <!-- Product Footer -->
                             <div class="product-footer">
-                                <button class="btn btn-primary btn-add-cart w-100" data-product-id="@item.Id">
+                                <button class="btn btn-primary btn-add-cart w-100" 
+                                        data-product-id="@item.Id" 
+                                        data-product-name="@item.Name">
                                     <i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ
                                 </button>
                             </div>
@@ -271,36 +280,200 @@
 
 @section Scripts {
     <script>
-        // Add to cart functionality
-        $('.btn-add-cart').click(function() {
-            const productId = $(this).data('product-id');
-            const button = $(this);
-            
-            // Simulate add to cart
-            button.html('<i class="bi bi-check me-2"></i>Đã thêm!');
-            button.removeClass('btn-primary').addClass('btn-success');
-            
-            setTimeout(() => {
-                button.html('<i class="bi bi-cart-plus me-2"></i>Thêm vào giỏ');
-                button.removeClass('btn-success').addClass('btn-primary');
-                
-                // Update cart badge count
-                const cartBadge = $('.cart-btn .badge');
-                const currentCount = parseInt(cartBadge.text()) || 0;
-                cartBadge.text(currentCount + 1);
-                
-                // Bounce effect on cart button
-                $('.cart-btn').addClass('animate__animated animate__rubberBand');
-                setTimeout(() => {
-                    $('.cart-btn').removeClass('animate__animated animate__rubberBand');
-                }, 1000);
-            }, 2000);
-            
-            // Thêm phần xử lý ajax gọi API thêm vào giỏ hàng thực tế ở đây
-            console.log('Đã thêm sản phẩm vào giỏ hàng:', productId);
+        $(document).ready(function() {
+            // Cập nhật số lượng giỏ hàng khi trang load
+            updateCartCount();
         });
-        
-        // Smooth scroll
+
+        // Add to cart functionality cho nút chính
+        $('.btn-add-cart').click(function() {
+            addToCartHandler($(this));
+        });
+
+        // Add to cart functionality cho nút quick (trên overlay)
+        $('.btn-add-cart-quick').click(function() {
+            addToCartHandler($(this));
+        });
+
+        // Hàm xử lý thêm vào giỏ hàng chung
+        function addToCartHandler(button) {
+            const productId = button.data('product-id');
+            const productName = button.data('product-name');
+            const originalHtml = button.html();
+            
+            // Disable button và hiển thị loading
+            button.prop('disabled', true);
+            if (button.hasClass('btn-add-cart')) {
+                button.html('<span class="spinner-border spinner-border-sm me-2"></span>Đang thêm...');
+            } else {
+                button.html('<span class="spinner-border spinner-border-sm"></span>');
+            }
+            
+            // AJAX call để thêm vào giỏ hàng
+            $.ajax({
+                url: '@Url.Action("AddToCart", "ShoppingCart")',
+                type: 'POST',
+                data: {
+                    productId: productId,
+                    quantity: 1
+                },
+                success: function(response) {
+                    if (response.success) {
+                        // Hiển thị thông báo thành công
+                        if (button.hasClass('btn-add-cart')) {
+                            button.html('<i class="bi bi-check me-2"></i>Đã thêm!');
+                        } else {
+                            button.html('<i class="bi bi-check"></i>');
+                        }
+                        button.removeClass('btn-primary btn-success').addClass('btn-success');
+                        
+                        // Cập nhật số lượng giỏ hàng
+                        updateCartCount();
+                        
+                        // Hiển thị toast notification
+                        showToast('Thành công!', `Đã thêm "${productName}" vào giỏ hàng`, 'success');
+                        
+                        // Reset button sau 2 giây
+                        setTimeout(() => {
+                            button.html(originalHtml);
+                            button.removeClass('btn-success').addClass('btn-primary');
+                            button.prop('disabled', false);
+                        }, 2000);
+                        
+                        // Animation hiệu ứng bay đến giỏ hàng
+                        animateToCart(button);
+                        
+                    } else {
+                        // Hiển thị lỗi
+                        showToast('Lỗi!', response.message, 'error');
+                        resetButton();
+                    }
+                },
+                error: function() {
+                    showToast('Lỗi!', 'Không thể thêm sản phẩm vào giỏ hàng', 'error');
+                    resetButton();
+                }
+            });
+            
+            function resetButton() {
+                button.html(originalHtml);
+                button.prop('disabled', false);
+            }
+        }
+
+        // Wishlist functionality
+        $('.btn-wishlist').click(function() {
+            $(this).toggleClass('btn-outline-primary btn-danger');
+            const icon = $(this).find('i');
+            icon.toggleClass('bi-heart bi-heart-fill');
+            
+            const isAdded = $(this).hasClass('btn-danger');
+            const message = isAdded ? 'Đã thêm vào danh sách yêu thích' : 'Đã xóa khỏi danh sách yêu thích';
+            showToast('Thông báo', message, 'success');
+        });
+
+        // Cập nhật số lượng giỏ hàng
+        function updateCartCount() {
+            $.get('@Url.Action("GetCartCount", "ShoppingCart")', function(data) {
+                const cartBadge = $('.cart-btn .badge');
+                cartBadge.text(data.count);
+                
+                if (data.count > 0) {
+                    cartBadge.removeClass('d-none');
+                    // Animation bounce effect
+                    cartBadge.addClass('animate__animated animate__pulse');
+                    setTimeout(() => {
+                        cartBadge.removeClass('animate__animated animate__pulse');
+                    }, 1000);
+                } else {
+                    cartBadge.addClass('d-none');
+                }
+            }).fail(function() {
+                $('.cart-btn .badge').text('0').addClass('d-none');
+            });
+        }
+
+        // Animation hiệu ứng bay đến giỏ hàng
+        function animateToCart(button) {
+            const cart = $('.cart-btn');
+            if (cart.length === 0) return;
+            
+            const buttonOffset = button.offset();
+            const cartOffset = cart.offset();
+            
+            // Tạo element animation
+            const flyingIcon = $('<i class="bi bi-cart-plus"></i>');
+            flyingIcon.css({
+                position: 'fixed',
+                top: buttonOffset.top,
+                left: buttonOffset.left,
+                'z-index': 9999,
+                'font-size': '24px',
+                color: '#198754',
+                'pointer-events': 'none',
+                transition: 'all 0.8s cubic-bezier(0.2, 0, 0.2, 1)'
+            });
+            
+            $('body').append(flyingIcon);
+            
+            // Animate đến giỏ hàng
+            setTimeout(() => {
+                flyingIcon.css({
+                    top: cartOffset.top,
+                    left: cartOffset.left,
+                    transform: 'scale(0.5)',
+                    opacity: 0
+                });
+            }, 50);
+            
+            // Xóa element sau animation
+            setTimeout(() => {
+                flyingIcon.remove();
+                // Bounce effect cho cart
+                cart.addClass('animate__animated animate__rubberBand');
+                setTimeout(() => {
+                    cart.removeClass('animate__animated animate__rubberBand');
+                }, 1000);
+            }, 850);
+        }
+
+        // Toast notification function
+        function showToast(title, message, type) {
+            const toastClass = type === 'success' ? 'bg-success' : 'bg-danger';
+            const icon = type === 'success' ? 'bi-check-circle' : 'bi-exclamation-triangle';
+            
+            const toastHtml = `
+                <div class="toast ${toastClass} text-white" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4000">
+                    <div class="toast-header ${toastClass} text-white border-0">
+                        <i class="bi ${icon} me-2"></i>
+                        <strong class="me-auto">${title}</strong>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast"></button>
+                    </div>
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                </div>
+            `;
+            
+            // Tạo container nếu chưa có
+            if (!$('#toast-container').length) {
+                $('body').append('<div id="toast-container" class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1055;"></div>');
+            }
+            
+            const $toast = $(toastHtml);
+            $('#toast-container').append($toast);
+            
+            // Hiển thị toast
+            const toast = new bootstrap.Toast($toast[0]);
+            toast.show();
+            
+            // Tự động xóa toast sau khi ẩn
+            $toast.on('hidden.bs.toast', function() {
+                $(this).remove();
+            });
+        }
+
+        // Smooth scroll cho các anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();

@@ -9,6 +9,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Cấu hình Session - THÊM MỚI
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // Session timeout 30 phút
+    options.Cookie.HttpOnly = true; // Bảo mật cookie
+    options.Cookie.IsEssential = true; // Cookie cần thiết
+});
+
 // Cấu hình Identity với ApplicationUser
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options => {
     options.Password.RequireDigit = false;
@@ -49,6 +58,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+// QUAN TRỌNG: Thêm Session middleware - TRƯỚC Authentication và Authorization
+app.UseSession();
 
 // QUAN TRỌNG: Thứ tự Authentication và Authorization
 app.UseAuthentication();
