@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using WebsiteBanHang.Models;
 using WebsiteBanHang.Repositories;
-
+using Microsoft.AspNetCore.Authorization;
 namespace WebsiteBanHang.Controllers
 {
+    [Area ("Admin")]
+    [Authorize(Roles = SD.Role_Admin)]// Chỉ cho phép người dùng có vai trò Admin truy cập vào các chức năng này
     public class ProductController : Controller
     {
         private readonly IProductRepository _productRepository;
