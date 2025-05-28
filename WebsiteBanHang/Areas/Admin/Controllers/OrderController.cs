@@ -20,12 +20,22 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
         }
 
         // Hiển thị danh sách tất cả đơn hàng
+        // Areas/Admin/Controllers/OrderController.cs
         public async Task<IActionResult> Index()
         {
             try
             {
+                // Tải danh sách đơn hàng mặc định
                 var orders = await _orderRepository.GetAllAsync();
-                return View(orders);
+
+                // Tính tổng doanh thu
+                decimal totalRevenue = orders.Sum(o => o.TotalPrice);
+
+                // Truyền dữ liệu qua ViewBag để hiển thị
+                ViewBag.TotalOrders = orders.Count();
+                ViewBag.TotalRevenue = totalRevenue;
+
+                return View(orders); // Truyền danh sách đơn hàng vào View
             }
             catch (Exception ex)
             {

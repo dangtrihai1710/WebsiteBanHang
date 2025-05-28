@@ -1,9 +1,6 @@
 ﻿@model IEnumerable<WebsiteBanHang.Models.Order>
-@using WebsiteBanHang.Models
 @{
     ViewData["Title"] = "Quản lý đơn hàng";
-    // Khai báo statuses một lần ở đây, ngoài vòng lặp
-    var statuses = new[] { "Đang xử lý", "Đã xác nhận", "Đang giao", "Hoàn thành", "Đã hủy" };
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
@@ -16,14 +13,14 @@
 </div>
 
 <!-- Stats Cards -->
-<div class="row mb-4" id="statsCards" style="display: none;">
+<div class="row mb-4">
     <div class="col-lg-3 col-md-6 mb-3">
         <div class="card card-admin bg-primary text-white">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <h6 class="card-title mb-0">Tổng đơn hàng</h6>
-                        <h2 class="mb-0" id="totalOrders">0</h2>
+                        <h2 class="mb-0">@ViewBag.TotalOrders</h2>
                     </div>
                     <i class="bi bi-cart-check" style="font-size: 2rem; opacity: 0.7;"></i>
                 </div>
@@ -36,26 +33,83 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <div>
                         <h6 class="card-title mb-0">Doanh thu</h6>
-                        <h2 class="mb-0" id="totalRevenue">0 VNĐ</h2>
+                        <h2 class="mb-0">@ViewBag.TotalRevenue.ToString("#,##0") VNĐ</h2>
                     </div>
                     <i class="bi bi-currency-dollar" style="font-size: 2rem; opacity: 0.7;"></i>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
+<!-- Danh sách đơn hàng -->
+<div class="card card-admin">
+    <div class="card-header">
+        <h5 class="card-title mb-0"><i class="bi bi-list me-2"></i>Danh sách đơn hàng</h5>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover" id="orderTable">
+                <thead class="table-light">
+                    <tr>
+                        <th>Mã đơn</th>
+                        <th>Khách hàng</th>
+                        <th>Ngày đặt</th>
+                        <th>Tổng tiền</th>
+                        <th>Địa chỉ giao hàng</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>#@item.Id</td>
+                            <td>@(item.ApplicationUser?.FullName ?? item.ApplicationUser?.Email ?? "Không có thông tin")</td>
+                            <td>@item.OrderDate.ToString("dd/MM/yyyy HH:mm")</td>
+                            <td>@item.TotalPrice.ToString("#,##0") VNĐ</td>
+                            <td>@(item.ShippingAddress?.Length > 30 ? item.ShippingAddress.Substring(0, 30) + "..." : item.ShippingAddress)</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-info btn-sm" title="Xem chi tiết">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm" title="Xóa">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 @section Scripts {
     <script>
+                $(document).ready(function() {
+            // Khởi tạo DataTable
+            $('#orderTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Vietnamese.json"
+                },
+                "responsive": true,
+                "pageLength": 10,
+                "order": [[0, "desc"]]
+            });
+        });
         function loadOrderStats() {
-            $('#statsCards').toggle();
-
             $.get('@Url.Action("GetOrderStats", "Order")')
                 .done(function(response) {
                     if (response.success) {
+                        // Cập nhật các thông số thống kê
                         $('#totalOrders').text(response.totalOrders);
                         $('#totalRevenue').text(response.totalRevenue.toLocaleString() + ' VNĐ');
+
+                        // Cập nhật lại bảng đơn hàng nếu cần
+                        // Có thể thêm code để tải lại bảng đơn hàng ở đây
                     }
                 });
         }
