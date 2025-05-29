@@ -10,7 +10,7 @@ namespace WebsiteBanHang.Models
         [Required, StringLength(100)]
         public string Name { get; set; } = string.Empty; // Fix: Khởi tạo giá trị mặc định
 
-        [Range(0.01, 10000000)]
+        [Range(0.01, 1000000000)]
         public decimal Price { get; set; }
 
         public string Description { get; set; } = string.Empty; // Fix: Khởi tạo giá trị mặc định

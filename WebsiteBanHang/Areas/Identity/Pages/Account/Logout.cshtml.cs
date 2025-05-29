@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using WebsiteBanHang.Models;
@@ -20,14 +20,10 @@ namespace WebsiteBanHang.Areas.Identity.Pages.Account
         {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
-            if (returnUrl != null)
-            {
-                return LocalRedirect(returnUrl);
-            }
-            else
-            {
-                return RedirectToPage();
-            }
+
+            // Sửa đoạn này để luôn trở về trang chủ
+            returnUrl = Url.Content("~/");
+            return LocalRedirect(returnUrl);
         }
     }
 }

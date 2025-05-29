@@ -31,7 +31,7 @@
                         <div class="col-md-6 mb-3">
                             <label asp-for="Price" class="form-label">Giá <span class="text-danger">*</span></label>
                             <div class="input-group">
-                                <input asp-for="Price" class="form-control" placeholder="Ví dụ: 120000" type="number" min="0" step="1" />
+                                <input asp-for="Price" class="form-control" placeholder="Ví dụ: 120000" type="number" min="0" step="1" value="@(Model != null ? Convert.ToInt32(Model.Price) : 0)" />
                                 <span class="input-group-text">VNĐ</span>
                             </div>
                             <span asp-validation-for="Price" class="text-danger"></span>
