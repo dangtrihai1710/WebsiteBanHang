@@ -1,5 +1,4 @@
-﻿<!-- 1. Views/Shared/_Layout.cshtml - Code tổng đã cập nhật -->
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="utf-8" />
@@ -21,6 +20,17 @@
             <a class="navbar-brand fw-bold text-primary fs-3" asp-area="" asp-controller="Home" asp-action="Index">
                 <i class="bi bi-shop me-2"></i>ShopPro
             </a>
+
+            <!-- Cart Button & User Auth for Mobile -->
+            <div class="d-flex align-items-center d-lg-none ms-auto me-2">
+                <a asp-controller="ShoppingCart" asp-action="Index"
+                   class="btn btn-outline-dark btn-sm me-2 cart-btn position-relative"
+                   title="Giỏ hàng">
+                    <i class="bi-cart-fill"></i>
+                    <span class="badge bg-danger text-white ms-1 rounded-pill position-absolute top-0 start-100 translate-middle d-none"
+                          id="cart-badge-mobile">0</span>
+                </a>
+            </div>
 
             <!-- Mobile Toggle Button -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -60,7 +70,7 @@
                 </ul>
 
                 <!-- Search Bar -->
-                <form class="d-flex me-3" asp-controller="Product" asp-action="Index" method="get">
+                <form class="d-flex me-lg-3 my-2 my-lg-0 flex-grow-1 flex-lg-grow-0" asp-controller="Product" asp-action="Index" method="get">
                     <div class="input-group">
                         <input class="form-control search-input" type="search" name="searchTerm"
                                placeholder="Tìm kiếm sản phẩm..." aria-label="Search" value="@ViewBag.SearchTerm">
@@ -70,8 +80,8 @@
                     </div>
                 </form>
 
-                <!-- Right Side Navigation -->
-                <div class="d-flex align-items-center">
+                <!-- Right Side Navigation - Hidden on Mobile -->
+                <div class="d-none d-lg-flex align-items-center">
                     <!-- Cart Button -->
                     <a asp-controller="ShoppingCart" asp-action="Index"
                        class="btn btn-outline-dark me-3 cart-btn position-relative"
@@ -83,6 +93,11 @@
                     </a>
 
                     <!-- User Authentication -->
+                    <partial name="_LoginPartial" />
+                </div>
+
+                <!-- User Authentication for Mobile -->
+                <div class="d-lg-none mt-3">
                     <partial name="_LoginPartial" />
                 </div>
             </div>

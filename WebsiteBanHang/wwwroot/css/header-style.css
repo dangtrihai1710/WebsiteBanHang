@@ -23,6 +23,8 @@
 
 .search-btn {
     padding: 0.375rem 0.75rem;
+    width: auto;
+    min-width: 40px;
 }
 
 /* Nút giỏ hàng */
@@ -63,6 +65,7 @@
 
     .search-btn {
         margin: 0.5rem 0;
+        min-width: 40px;
     }
 
     /* Nút giỏ hàng trên mobile */
@@ -80,6 +83,17 @@
     /* Ẩn biểu tượng nếu cần trên mobile */
     .nav-link i {
         margin-right: 0.5rem;
+    }
+
+    /* Đảm bảo form tìm kiếm có chiều rộng đầy đủ trên mobile */
+    .navbar form {
+        width: 100%;
+    }
+
+    /* Đảm bảo container có padding phù hợp */
+    .navbar > .container {
+        padding-right: 0.75rem;
+        padding-left: 0.75rem;
     }
 }
 
@@ -114,6 +128,11 @@
         flex-wrap: nowrap;
         justify-content: space-between;
     }
+
+    /* Đảm bảo nút tìm kiếm không bị thu nhỏ */
+    .search-btn {
+        min-width: 40px;
+    }
 }
 
 /* Màn hình lớn hơn 992px (Desktop) */
@@ -133,4 +152,14 @@
     .dropdown-menu {
         margin-top: 0;
     }
+}
+
+/* Đảm bảo input-group responsive */
+.input-group {
+    flex-wrap: nowrap;
+}
+
+/* Đảm bảo navbar có z-index cao hơn */
+.navbar {
+    z-index: 1030;
 }
