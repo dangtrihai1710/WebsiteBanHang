@@ -9,7 +9,6 @@ using System.Data;
 using WebsiteBanHang.Models;
 using WebsiteBanHang.Repositories;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
-using static NuGet.Packaging.PackagingConstants;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace WebsiteBanHang.Views.Shared.Components.CategoryMenu
