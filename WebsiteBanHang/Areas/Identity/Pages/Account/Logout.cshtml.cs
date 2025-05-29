@@ -21,9 +21,8 @@ namespace WebsiteBanHang.Areas.Identity.Pages.Account
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
 
-            // Sửa đoạn này để luôn trở về trang chủ
-            returnUrl = Url.Content("~/");
-            return LocalRedirect(returnUrl);
+            // SỬA: Luôn trở về trang chủ, không quan tâm returnUrl
+            return Redirect("/");
         }
     }
 }

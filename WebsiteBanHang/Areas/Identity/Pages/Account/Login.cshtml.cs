@@ -52,18 +52,18 @@ namespace WebsiteBanHang.Areas.Identity.Pages.Account
                 ModelState.AddModelError(string.Empty, ErrorMessage);
             }
 
-            returnUrl ??= Url.Content("~/");
+            // SỬA: Không set returnUrl mặc định
+            ReturnUrl = returnUrl;
 
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
-
-            ReturnUrl = returnUrl;
         }
 
         public async Task<IActionResult> OnPostAsync(string? returnUrl = null)
         {
-            returnUrl ??= Url.Content("~/");
+            // SỬA: Bỏ qua returnUrl và luôn về trang chủ
+            returnUrl = "/";
 
             ExternalLogins = (await _signInManager.GetExternalAuthenticationSchemesAsync()).ToList();
 
@@ -82,7 +82,8 @@ namespace WebsiteBanHang.Areas.Identity.Pages.Account
                     // Merge giỏ hàng sau khi đăng nhập thành công
                     await MergeGuestCartToUserCart(guestCart);
 
-                    return LocalRedirect(returnUrl);
+                    // Redirect về trang chủ
+                    return Redirect("/");
                 }
                 if (result.IsLockedOut)
                 {
@@ -105,7 +106,6 @@ namespace WebsiteBanHang.Areas.Identity.Pages.Account
             {
                 if (guestCart != null && guestCart.Items.Any())
                 {
-                    // Lấy thông tin user hiện tại
                     var user = await _signInManager.UserManager.GetUserAsync(HttpContext.User);
                     if (user != null)
                     {
@@ -113,16 +113,13 @@ namespace WebsiteBanHang.Areas.Identity.Pages.Account
                         var userCart = HttpContext.Session.GetObjectFromJson<ShoppingCart>(userCartKey)
                                       ?? new ShoppingCart();
 
-                        // Merge giỏ hàng guest vào giỏ hàng user
                         foreach (var item in guestCart.Items)
                         {
                             userCart.AddItem(item);
                         }
 
-                        // Lưu giỏ hàng đã merge
                         HttpContext.Session.SetObjectAsJson(userCartKey, userCart);
 
-                        // Xóa giỏ hàng guest
                         var guestCartKey = $"Cart_{HttpContext.Session.Id}";
                         HttpContext.Session.Remove(guestCartKey);
 
