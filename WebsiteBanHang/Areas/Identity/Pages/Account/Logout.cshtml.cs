@@ -16,13 +16,16 @@ namespace WebsiteBanHang.Areas.Identity.Pages.Account
             _logger = logger;
         }
 
+        // Trong LogoutModel.cs
         public async Task<IActionResult> OnPost(string? returnUrl = null)
         {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
 
-            // SỬA: Luôn trở về trang chủ, không quan tâm returnUrl
-            return Redirect("/");
+            // Thêm script để xóa bất kỳ dữ liệu nào được lưu trong localStorage
+            TempData["ClearClientData"] = true;
+
+            return LocalRedirect("~/");
         }
     }
 }

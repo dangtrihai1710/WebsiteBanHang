@@ -218,7 +218,98 @@
     <!-- Scripts -->
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Đoạn script xử lý đăng xuất -->
+    <script>
+        // Kiểm tra nếu đang ở trang đăng xuất
+        if (window.location.pathname.toLowerCase().includes('/identity/account/logout')) {
+            // Xóa toàn bộ cookie và localStorage
+            function clearAllCookies() {
+                const cookies = document.cookie.split(";");
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i];
+                    const eqPos = cookie.indexOf("=");
+                    const name = eqPos > -1 ? cookie.substr(0, eqPos) : cookie;
+                    document.cookie = name + "=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/";
+                }
+            }
+
+            // Xóa các dữ liệu lưu trữ
+            localStorage.clear();
+            sessionStorage.clear();
+            clearAllCookies();
+
+            // Đặt timeout để chuyển hướng về trang chủ
+            setTimeout(function() {
+                window.location.href = '/';
+            }, 1000);
+        }
+
+        // Cập nhật trạng thái đăng nhập
+        $(document).ready(function() {
+            // Kiểm tra trạng thái đăng nhập khi tải trang
+            checkLoginStatus();
+
+            // Xử lý lỗi JavaScript
+            window.onerror = function(message, source, lineno, colno, error) {
+                console.log("Error caught: ", message);
+                // Ngăn chặn các lỗi không cần thiết hiển thị
+                return true;
+            };
+        });
+
+        function checkLoginStatus() {
+            // Kiểm tra cookie xác thực
+            const isAuthenticated = document.cookie.includes('.AspNetCore.Identity.Application');
+
+            // Nếu đang ở trang đăng xuất và không còn cookie xác thực
+            if (window.location.pathname.toLowerCase().includes('/identity/account/logout') && !isAuthenticated) {
+                // Tải lại trang chủ
+                window.location.href = '/';
+            }
+        }
+    </script>
+
+    <!-- Sửa lại cách import script để tránh lỗi -->
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <!-- Đảm bảo rằng các script đã được tải trước khi gọi các hàm -->
+    <script>
+        // Hàm an toàn để gọi các hàm từ script khác
+        function safeExecute(fnName, fallbackFn) {
+            try {
+                if (typeof window[fnName] === 'function') {
+                    window[fnName]();
+                } else if (fallbackFn) {
+                    fallbackFn();
+                }
+            } catch (e) {
+                console.log("Error executing " + fnName + ": " + e.message);
+            }
+        }
+
+        // Gọi các hàm cập nhật giỏ hàng một cách an toàn
+        $(document).ready(function() {
+            safeExecute('updateCartBadge', function() {
+                // Fallback nếu hàm updateCartBadge không tồn tại
+                console.log("Using fallback for updateCartBadge");
+                try {
+                    $.get('/ShoppingCart/GetCartCount', function(data) {
+                        $('#cart-badge, #cart-badge-mobile').text(data.count);
+                        if (data.count > 0) {
+                            $('#cart-badge, #cart-badge-mobile').removeClass('d-none');
+                        } else {
+                            $('#cart-badge, #cart-badge-mobile').addClass('d-none');
+                        }
+                    });
+                } catch (e) {
+                    console.log("Fallback also failed: " + e.message);
+                }
+            });
+        });
+    </script>
+
+    <!-- Các script khác -->
     <script src="~/js/cart.js" asp-append-version="true"></script>
     <script src="~/js/dynamic-categories.js" asp-append-version="true"></script>
 
