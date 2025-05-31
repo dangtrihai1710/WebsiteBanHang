@@ -18,6 +18,7 @@ namespace WebsiteBanHang.Repositories
             {
                 return await _context.Products
                     .Include(p => p.Category)
+                    .Include(p => p.Images) // ✅ Include Images
                     .OrderByDescending(p => p.Id)
                     .ToListAsync();
             }
@@ -33,6 +34,7 @@ namespace WebsiteBanHang.Repositories
             {
                 var product = await _context.Products
                     .Include(p => p.Category)
+                    .Include(p => p.Images) // ✅ Include Images
                     .FirstOrDefaultAsync(p => p.Id == id);
 
                 return product;
@@ -121,9 +123,18 @@ namespace WebsiteBanHang.Repositories
         {
             try
             {
-                var product = await _context.Products.FindAsync(id);
+                var product = await _context.Products
+                    .Include(p => p.Images) // ✅ Include Images để xóa cùng
+                    .FirstOrDefaultAsync(p => p.Id == id);
+
                 if (product == null)
                     throw new ArgumentException("Sản phẩm không tồn tại");
+
+                // Xóa tất cả ảnh của sản phẩm trước
+                if (product.Images != null && product.Images.Any())
+                {
+                    _context.ProductImages.RemoveRange(product.Images);
+                }
 
                 _context.Products.Remove(product);
                 await _context.SaveChangesAsync();

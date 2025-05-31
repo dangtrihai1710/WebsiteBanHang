@@ -1,4 +1,4 @@
-﻿// Program.cs - THÊM CODE TẠO ADMIN USER
+﻿// Program.cs - THÊM ProductImageRepository
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using WebsiteBanHang.Models;
@@ -45,10 +45,11 @@ builder.Services.ConfigureApplicationCookie(options =>
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
 
-// Đăng ký Repositories
+// Đăng ký Repositories - THÊM ProductImageRepository
 builder.Services.AddScoped<IProductRepository, EFProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, EFCategoryRepository>();
 builder.Services.AddScoped<IOrderRepository, EFOrderRepository>();
+builder.Services.AddScoped<IProductImageRepository, EFProductImageRepository>(); // ✅ THÊM DÒNG NÀY
 
 var app = builder.Build();
 

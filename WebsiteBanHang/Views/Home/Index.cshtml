@@ -150,17 +150,43 @@
             <div class="row g-4">
                 @foreach (var item in Model.Take(8))
                 {
+                    
+                        // ✅ SỬA: Di chuyển logic C# vào block @{...}
+                        string productImageUrl = "/images/placeholder.jpg"; // Default placeholder
+                        int imageCount = 0;
+                        
+                        // Ưu tiên lấy ảnh chính từ Images
+                        if (item.Images != null && item.Images.Any())
+                        {
+                            var mainImage = item.Images.FirstOrDefault(i => i.IsMain) ?? item.Images.First();
+                            productImageUrl = mainImage.Url;
+                            imageCount = item.Images.Count;
+                        }
+                        // Fallback về ImageUrl nếu không có Images
+                        else if (!string.IsNullOrEmpty(item.ImageUrl))
+                        {
+                            productImageUrl = item.ImageUrl;
+                            imageCount = 1;
+                        }
+                    
+                    
                     <div class="col-xl-3 col-lg-4 col-md-6">
                         <div class="product-card modern-card h-100">
                             <!-- Product Badges -->
                             <div class="product-badges">
                                 <span class="badge bg-danger">Hot</span>
                                 <span class="badge bg-success">-20%</span>
+                                @if (imageCount > 1)
+                                {
+                                    <span class="badge bg-info">
+                                        <i class="bi bi-images me-1"></i>@imageCount
+                                    </span>
+                                }
                             </div>
                             
                             <!-- Product Image -->
                             <div class="product-image-container">
-                                <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "/images/placeholder.jpg" : item.ImageUrl)" 
+                                <img src="@productImageUrl" 
                                      class="product-image" alt="@item.Name">
                                 <div class="product-overlay">
                                     <div class="product-actions">
@@ -201,6 +227,15 @@
                                     <span class="price-current">@item.Price.ToString("#,##0") VNĐ</span>
                                     <span class="price-old">@((item.Price * 1.2m).ToString("#,##0")) VNĐ</span>
                                 </div>
+                                @if (imageCount > 1)
+                                {
+                                    <div class="mt-2">
+                                        <small class="text-muted">
+                                            <i class="bi bi-camera me-1"></i>
+                                            @imageCount ảnh sản phẩm
+                                        </small>
+                                    </div>
+                                }
                             </div>
                             
                             <!-- Product Footer -->
