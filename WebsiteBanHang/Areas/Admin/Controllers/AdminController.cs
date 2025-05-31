@@ -1,10 +1,13 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿// Areas/Admin/Controllers/AdminController.cs - FIX AUTHORIZATION
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using WebsiteBanHang.Models;
 using WebsiteBanHang.Repositories;
 
 namespace WebsiteBanHang.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = SD.Role_Admin)] // ✅ QUAN TRỌNG: Thêm dòng này
     public class AdminController : Controller
     {
         private readonly IProductRepository _productRepository;

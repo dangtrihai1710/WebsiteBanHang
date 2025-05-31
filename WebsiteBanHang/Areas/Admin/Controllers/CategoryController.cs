@@ -1,11 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿// Areas/Admin/Controllers/CategoryController.cs - FIX AUTHORIZATION
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 using WebsiteBanHang.Models;
 using WebsiteBanHang.Repositories;
 
 namespace WebsiteBanHang.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = SD.Role_Admin)] // ✅ QUAN TRỌNG: Thêm dòng này
     public class CategoryController : Controller
     {
         private readonly ICategoryRepository _categoryRepository;
