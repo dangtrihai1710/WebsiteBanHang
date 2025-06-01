@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿// Areas/Admin/Controllers/ProductController.cs - CODE HOÀN CHỈNH ĐÃ SỬA
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Authorization;
 using WebsiteBanHang.Models;
@@ -13,34 +14,60 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
         private readonly IProductRepository _productRepository;
         private readonly ICategoryRepository _categoryRepository;
         private readonly IProductImageRepository _productImageRepository;
+        private readonly IWebHostEnvironment _environment;
+        private readonly ILogger<ProductController> _logger;
 
         public ProductController(
             IProductRepository productRepository,
             ICategoryRepository categoryRepository,
-            IProductImageRepository productImageRepository)
+            IProductImageRepository productImageRepository,
+            IWebHostEnvironment environment,
+            ILogger<ProductController> logger)
         {
             _productRepository = productRepository;
             _categoryRepository = categoryRepository;
             _productImageRepository = productImageRepository;
+            _environment = environment;
+            _logger = logger;
         }
 
+        // ✅ SỬA: Index với logic đồng bộ ảnh chính
         public async Task<IActionResult> Index()
         {
             try
             {
                 var products = await _productRepository.GetAllAsync();
 
-                // Lấy ảnh chính cho mỗi sản phẩm
+                // ✅ FIX: Đồng bộ ảnh chính cho mỗi sản phẩm
                 foreach (var product in products)
                 {
+                    // Lấy ảnh chính từ ProductImages
                     var mainImage = await _productImageRepository.GetMainImageByProductIdAsync(product.Id);
-                    product.ImageUrl = mainImage?.Url;
+
+                    if (mainImage != null)
+                    {
+                        // Cập nhật ImageUrl nếu khác
+                        if (product.ImageUrl != mainImage.Url)
+                        {
+                            product.ImageUrl = mainImage.Url;
+                            await _productRepository.UpdateAsync(product);
+                        }
+                    }
+                    else if (product.Images != null && product.Images.Any())
+                    {
+                        // Nếu không có ảnh chính, lấy ảnh đầu tiên và đặt làm chính
+                        var firstImage = product.Images.OrderBy(i => i.DisplayOrder).First();
+                        await _productImageRepository.SetMainImageAsync(product.Id, firstImage.Id);
+                        product.ImageUrl = firstImage.Url;
+                        await _productRepository.UpdateAsync(product);
+                    }
                 }
 
                 return View(products);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error loading products list");
                 TempData["ErrorMessage"] = "Lỗi khi tải danh sách sản phẩm: " + ex.Message;
                 return View(new List<Product>());
             }
@@ -327,7 +354,7 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
             }
         }
 
-        // API để set ảnh chính
+        // ✅ THÊM: API để set ảnh chính
         [HttpPost]
         public async Task<IActionResult> SetMainImage(int productId, int imageId)
         {
@@ -352,28 +379,264 @@ namespace WebsiteBanHang.Areas.Admin.Controllers
             }
         }
 
+        // ✅ THÊM: API đồng bộ tất cả ảnh
+        [HttpPost]
+        public async Task<IActionResult> SyncAllImages()
+        {
+            try
+            {
+                var products = await _productRepository.GetAllAsync();
+                int syncedCount = 0;
+                var errors = new List<string>();
+
+                foreach (var product in products)
+                {
+                    try
+                    {
+                        var mainImage = await _productImageRepository.GetMainImageByProductIdAsync(product.Id);
+
+                        if (mainImage != null && product.ImageUrl != mainImage.Url)
+                        {
+                            product.ImageUrl = mainImage.Url;
+                            await _productRepository.UpdateAsync(product);
+                            syncedCount++;
+                        }
+                        else if (mainImage == null && product.Images != null && product.Images.Any())
+                        {
+                            // Nếu không có ảnh chính, đặt ảnh đầu tiên làm ảnh chính
+                            var firstImage = product.Images.OrderBy(i => i.DisplayOrder).First();
+                            await _productImageRepository.SetMainImageAsync(product.Id, firstImage.Id);
+
+                            product.ImageUrl = firstImage.Url;
+                            await _productRepository.UpdateAsync(product);
+                            syncedCount++;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        errors.Add($"Sản phẩm {product.Name}: {ex.Message}");
+                    }
+                }
+
+                var message = $"Đã đồng bộ {syncedCount} sản phẩm thành công";
+                if (errors.Any())
+                {
+                    message += $". Có {errors.Count} lỗi xảy ra.";
+                }
+
+                _logger.LogInformation($"Synced {syncedCount} product images. Errors: {errors.Count}");
+
+                return Json(new
+                {
+                    success = true,
+                    message = message,
+                    syncedCount = syncedCount,
+                    errorCount = errors.Count,
+                    errors = errors
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error syncing all images");
+                return Json(new
+                {
+                    success = false,
+                    message = "Lỗi khi đồng bộ ảnh: " + ex.Message
+                });
+            }
+        }
+
+        // ✅ THÊM: API đồng bộ ảnh đơn lẻ
+        [HttpPost]
+        public async Task<IActionResult> SyncSingleProductImage(int productId)
+        {
+            try
+            {
+                var product = await _productRepository.GetByIdAsync(productId);
+                if (product == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy sản phẩm" });
+                }
+
+                var mainImage = await _productImageRepository.GetMainImageByProductIdAsync(productId);
+
+                if (mainImage != null)
+                {
+                    product.ImageUrl = mainImage.Url;
+                    await _productRepository.UpdateAsync(product);
+
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Đã đồng bộ ảnh thành công",
+                        newImageUrl = mainImage.Url
+                    });
+                }
+                else
+                {
+                    // Nếu không có ảnh chính, kiểm tra có ảnh nào khác không
+                    var images = await _productImageRepository.GetByProductIdAsync(productId);
+                    if (images.Any())
+                    {
+                        var firstImage = images.OrderBy(i => i.DisplayOrder).First();
+                        await _productImageRepository.SetMainImageAsync(productId, firstImage.Id);
+
+                        product.ImageUrl = firstImage.Url;
+                        await _productRepository.UpdateAsync(product);
+
+                        return Json(new
+                        {
+                            success = true,
+                            message = "Đã đặt ảnh đầu tiên làm ảnh chính",
+                            newImageUrl = firstImage.Url
+                        });
+                    }
+                    else
+                    {
+                        return Json(new
+                        {
+                            success = false,
+                            message = "Sản phẩm không có ảnh nào"
+                        });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error syncing single product image for product {productId}");
+                return Json(new
+                {
+                    success = false,
+                    message = "Lỗi: " + ex.Message
+                });
+            }
+        }
+
+        // ✅ THÊM: API làm sạch ảnh không tồn tại
+        [HttpPost]
+        public async Task<IActionResult> CleanupMissingImages()
+        {
+            try
+            {
+                var products = await _productRepository.GetAllAsync();
+                int cleanedCount = 0;
+
+                foreach (var product in products)
+                {
+                    // Kiểm tra ImageUrl chính
+                    if (!string.IsNullOrEmpty(product.ImageUrl) && !ImageExists(product.ImageUrl))
+                    {
+                        // Tìm ảnh thay thế từ ProductImages
+                        var validImage = await _productImageRepository.GetMainImageByProductIdAsync(product.Id);
+                        if (validImage != null && ImageExists(validImage.Url))
+                        {
+                            product.ImageUrl = validImage.Url;
+                            await _productRepository.UpdateAsync(product);
+                            cleanedCount++;
+                        }
+                        else
+                        {
+                            product.ImageUrl = null; // Set null thay vì placeholder
+                            await _productRepository.UpdateAsync(product);
+                            cleanedCount++;
+                        }
+                    }
+
+                    // Kiểm tra và xóa các ProductImage không tồn tại
+                    if (product.Images != null)
+                    {
+                        foreach (var image in product.Images.ToList())
+                        {
+                            if (!ImageExists(image.Url))
+                            {
+                                await _productImageRepository.DeleteAsync(image.Id);
+                                cleanedCount++;
+                            }
+                        }
+                    }
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    message = $"Đã làm sạch {cleanedCount} ảnh không tồn tại",
+                    cleanedCount = cleanedCount
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error cleaning up missing images");
+                return Json(new
+                {
+                    success = false,
+                    message = "Lỗi: " + ex.Message
+                });
+            }
+        }
+
+        // ✅ THÊM: Helper method kiểm tra ảnh tồn tại
+        private bool ImageExists(string imageUrl)
+        {
+            if (string.IsNullOrEmpty(imageUrl))
+                return false;
+
+            try
+            {
+                // Chuyển URL thành đường dẫn file
+                var imagePath = imageUrl.StartsWith("/") ? imageUrl.Substring(1) : imageUrl;
+                var fullPath = Path.Combine(_environment.WebRootPath, imagePath.Replace("/", Path.DirectorySeparatorChar.ToString()));
+
+                return System.IO.File.Exists(fullPath);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        // ✅ THÊM: Helper method lưu ảnh với validation
         private async Task<string> SaveImage(IFormFile image)
         {
             try
             {
-                var imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images");
+                // Kiểm tra file hợp lệ
+                if (image == null || image.Length == 0)
+                    throw new ArgumentException("File ảnh không hợp lệ");
+
+                // Kiểm tra định dạng file
+                var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
+                var fileExtension = Path.GetExtension(image.FileName).ToLowerInvariant();
+
+                if (!allowedExtensions.Contains(fileExtension))
+                    throw new ArgumentException("Chỉ chấp nhận file ảnh (.jpg, .jpeg, .png, .gif, .webp)");
+
+                // Kiểm tra kích thước file (max 5MB)
+                if (image.Length > 5 * 1024 * 1024)
+                    throw new ArgumentException("File ảnh không được vượt quá 5MB");
+
+                // Tạo thư mục nếu chưa có
+                var imagesFolder = Path.Combine(_environment.WebRootPath, "images");
                 if (!Directory.Exists(imagesFolder))
                 {
                     Directory.CreateDirectory(imagesFolder);
                 }
 
-                var fileName = Guid.NewGuid().ToString() + Path.GetExtension(image.FileName);
+                // Tạo tên file duy nhất
+                var fileName = Guid.NewGuid().ToString() + fileExtension;
                 var filePath = Path.Combine(imagesFolder, fileName);
 
+                // Lưu file
                 using (var fileStream = new FileStream(filePath, FileMode.Create))
                 {
                     await image.CopyToAsync(fileStream);
                 }
 
+                _logger.LogInformation($"Saved image: {fileName}");
                 return "/images/" + fileName;
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error saving image");
                 throw new Exception("Lỗi khi lưu hình ảnh: " + ex.Message);
             }
         }

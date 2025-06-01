@@ -1,13 +1,26 @@
-﻿@model IEnumerable<WebsiteBanHang.Models.Product>
+﻿<!-- Areas/Admin/Views/Product/Index.cshtml - Updated -->
+@model IEnumerable<WebsiteBanHang.Models.Product>
 @{
     ViewData["Title"] = "Quản lý sản phẩm";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2><i class="bi bi-box-seam me-2"></i>Quản lý sản phẩm</h2>
-    <a asp-action="Add" class="btn btn-primary btn-admin">
-        <i class="bi bi-plus-circle me-2"></i>Thêm sản phẩm mới
-    </a>
+    <div>
+        <!-- ✅ THÊM: Nút đồng bộ ảnh -->
+        <button class="btn btn-warning me-2" onclick="syncAllImages()" id="syncButton">
+            <i class="bi bi-arrow-repeat me-2"></i>Đồng bộ tất cả ảnh
+        </button>
+        <a asp-action="Add" class="btn btn-primary btn-admin">
+            <i class="bi bi-plus-circle me-2"></i>Thêm sản phẩm mới
+        </a>
+    </div>
+</div>
+
+<!-- ✅ THÊM: Thông báo đồng bộ -->
+<div id="syncAlert" class="alert alert-info d-none" role="alert">
+    <i class="bi bi-info-circle me-2"></i>
+    <span id="syncMessage"></span>
 </div>
 
 <div class="card card-admin">
@@ -27,21 +40,34 @@
                 <tbody>
                     @foreach (var item in Model)
                     {
-                        <tr>
+                        <tr data-product-id="@item.Id">
                             <td>
                                 @if (!string.IsNullOrEmpty(item.ImageUrl))
                                 {
-                                    <img src="@item.ImageUrl" alt="@item.Name" style="width: 50px; height: 50px; object-fit: cover;" class="rounded">
+                                    <img src="@item.ImageUrl" alt="@item.Name" style="width: 50px; height: 50px; object-fit: cover;" class="rounded product-image" data-product-id="@item.Id">
                                 }
                                 else
                                 {
                                     <div class="bg-light rounded d-flex align-items-center justify-content-center" style="width: 50px; height: 50px;">
                                         <i class="bi bi-image text-muted"></i>
+                                        <!-- ✅ THÊM: Nút đồng bộ cho sản phẩm không có ảnh -->
+                                        <button class="btn btn-sm btn-warning position-absolute"
+                                                onclick="syncSingleImage(@item.Id)"
+                                                title="Đồng bộ ảnh">
+                                            <i class="bi bi-arrow-repeat" style="font-size: 0.7rem;"></i>
+                                        </button>
                                     </div>
                                 }
                             </td>
                             <td>
                                 <strong>@item.Name</strong>
+                                <!-- ✅ THÊM: Hiển thị số ảnh -->
+                                @if (item.Images != null && item.Images.Any())
+                                {
+                                    <br>
+                            
+                                    <small class="text-muted">@item.Images.Count ảnh</small>
+                                }
                             </td>
                             <td>
                                 <span class="badge bg-success">@item.Price.ToString("#,##0") VNĐ</span>
@@ -68,6 +94,12 @@
                                     <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-danger btn-sm" title="Xóa">
                                         <i class="bi bi-trash"></i>
                                     </a>
+                                    <!-- ✅ THÊM: Nút đồng bộ ảnh đơn lẻ -->
+                                    <button class="btn btn-secondary btn-sm"
+                                            onclick="syncSingleImage(@item.Id)"
+                                            title="Đồng bộ ảnh">
+                                        <i class="bi bi-arrow-repeat"></i>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -77,3 +109,99 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        // ✅ THÊM: JavaScript cho chức năng đồng bộ ảnh
+
+        function syncAllImages() {
+            const button = document.getElementById('syncButton');
+            const originalHtml = button.innerHTML;
+
+            // Show loading
+            button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Đang đồng bộ...';
+            button.disabled = true;
+
+            showSyncAlert('Đang đồng bộ tất cả ảnh sản phẩm...', 'info');
+
+            $.ajax({
+                url: '@Url.Action("SyncAllImages")',
+                type: 'POST',
+                success: function(response) {
+                    if (response.success) {
+                        showSyncAlert(response.message, 'success');
+
+                        // Reload page để hiển thị ảnh mới
+                        setTimeout(() => {
+                            location.reload();
+                        }, 2000);
+                    } else {
+                        showSyncAlert('Lỗi: ' + response.message, 'danger');
+                    }
+                },
+                error: function() {
+                    showSyncAlert('Có lỗi xảy ra khi đồng bộ ảnh', 'danger');
+                },
+                complete: function() {
+                    button.innerHTML = originalHtml;
+                    button.disabled = false;
+                }
+            });
+        }
+
+        function syncSingleImage(productId) {
+            const productRow = $(`tr[data-product-id="${productId}"]`);
+            const imageCell = productRow.find('.product-image, .bg-light');
+
+            $.ajax({
+                url: '@Url.Action("SyncSingleProductImage")',
+                type: 'POST',
+                data: { productId: productId },
+                success: function(response) {
+                    if (response.success) {
+                        showSyncAlert(`Đã đồng bộ ảnh cho sản phẩm`, 'success');
+
+                        // Cập nhật ảnh trong bảng
+                        if (response.newImageUrl) {
+                            const newImageHtml = `<img src="${response.newImageUrl}" alt="Product" style="width: 50px; height: 50px; object-fit: cover;" class="rounded product-image" data-product-id="${productId}">`;
+                            imageCell.closest('td').html(newImageHtml);
+                        }
+                    } else {
+                        showSyncAlert('Lỗi: ' + response.message, 'warning');
+                    }
+                },
+                error: function() {
+                    showSyncAlert('Có lỗi xảy ra khi đồng bộ ảnh', 'danger');
+                }
+            });
+        }
+
+        function showSyncAlert(message, type) {
+            const alert = document.getElementById('syncAlert');
+            const messageSpan = document.getElementById('syncMessage');
+
+            // Update classes
+            alert.className = `alert alert-${type}`;
+            alert.classList.remove('d-none');
+
+            // Update message
+            messageSpan.textContent = message;
+
+            // Auto hide after 5 seconds for success/info
+            if (type === 'success' || type === 'info') {
+                setTimeout(() => {
+                    alert.classList.add('d-none');
+                }, 5000);
+            }
+        }
+
+        // Initialize DataTable
+        $(document).ready(function() {
+            $('#dataTable').DataTable({
+                "responsive": true,
+                "pageLength": 10,
+                "order": [[1, "asc"]]
+            });
+        });
+    </script>
+}
